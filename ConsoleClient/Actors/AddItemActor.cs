@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Slalom.Stacks.Messaging;
 
@@ -9,6 +10,8 @@ namespace ConsoleClient.Actors
         public override async Task<GoEvent> ExecuteAsync(GoCommand command)
         {
             await this.Domain.AddAsync(new Item("adf"));
+
+            Console.WriteLine(Context.MachineName);
 
             await Task.Delay(500);
 

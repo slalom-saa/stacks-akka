@@ -20,12 +20,12 @@ namespace Slalom.Stacks.Messaging.Routing
         private readonly Lazy<IEnumerable<IAuditStore>> _audits;
         private readonly Lazy<IEnumerable<IRequestStore>> _requests;
         private readonly Lazy<IExecutionContextResolver> _contextResolver;
-        public THandler Hanlder { get; }
+        public THandler Handler { get; }
         public IComponentContext ComponentContext { get; }
 
-        public AkkaHandler(THandler hanlder, IComponentContext context)
+        public AkkaHandler(THandler handler, IComponentContext context)
         {
-            this.Hanlder = hanlder;
+            this.Handler = handler;
             this.ComponentContext = context;
 
             _logger = new Lazy<ILogger>(context.Resolve<ILogger>);
@@ -34,7 +34,7 @@ namespace Slalom.Stacks.Messaging.Routing
             _requests = new Lazy<IEnumerable<IRequestStore>>(context.ResolveAll<IRequestStore>);
             _contextResolver = new Lazy<IExecutionContextResolver>(context.Resolve<IExecutionContextResolver>);
 
-            this.ReceiveAsync<ICommand>(this.HandleCommand);
+            this.ReceiveAsync<CommandEnvelop>(this.HandleCommand);
 
             this.Receive<IEvent>(e =>
             {
@@ -60,12 +60,13 @@ namespace Slalom.Stacks.Messaging.Routing
             result.AddValidationErrors(errors);
         }
 
-        private async Task HandleCommand(ICommand command)
+        private async Task HandleCommand(CommandEnvelop envelop)
         {
+            var command = (ICommand)envelop.Command;
             _logger.Value.Verbose("Starting execution for " + command.Type + " at \"{Path}\". {@Command}", this.Self.Path, command);
 
             // get the context
-            var context = _contextResolver.Value.Resolve();
+            var context = envelop.Context;
 
             var result = new CommandResult(context);
 
@@ -77,7 +78,8 @@ namespace Slalom.Stacks.Messaging.Routing
                 if (!result.ValidationErrors.Any())
                 {
                     // execute the handler
-                    var response = await this.Hanlder.HandleAsync(command);
+                    this.Handler.SetContext(context);
+                    var response = await this.Handler.HandleAsync(command);
 
                     result.AddResponse(response);
 

@@ -2,6 +2,8 @@
 using Akka.DI.AutoFac;
 using Autofac;
 using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Runtime;
+
 // ReSharper disable ObjectCreationAsStatement
 
 namespace Slalom.Stacks.Messaging
@@ -24,7 +26,7 @@ namespace Slalom.Stacks.Messaging
                         c.Instance.Arrange(instance.Assemblies);
                     }).SingleInstance().AsSelf().AutoActivate();
 
-                builder.Register(c => new AkkaCommandCoordinator(c.Resolve<AkkaRouter>()))
+                builder.Register(c => new AkkaCommandCoordinator(c.Resolve<AkkaRouter>(), c.Resolve<IExecutionContextResolver>()))
                     .AsImplementedInterfaces();
 
             });

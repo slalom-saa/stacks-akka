@@ -8,6 +8,7 @@ using Akka.DI.Core;
 using Autofac;
 using Newtonsoft.Json;
 using Slalom.Stacks.Reflection;
+using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
@@ -53,31 +54,31 @@ namespace Slalom.Stacks.Messaging.Routing
             }
         }
 
-        public async Task<CommandResult> Send(string path, string request)
+        public async Task<CommandResult> Send(string path, string request, ExecutionContext context)
         {
             var node = this.RootNode.Find(path);
 
             var command = (ICommand) JsonConvert.DeserializeObject(request, GetRequestType(node));
 
-            var result = await _system.ActorSelection("user/" + node.Path).Ask(command);
+            var result = await _system.ActorSelection("user/" + node.Path).Ask(new CommandEnvelop(command, context));
 
             return result as CommandResult;
         }
 
-        public async Task<CommandResult> Send(ICommand command)
+        public async Task<CommandResult> Send(ICommand command, ExecutionContext context)
         {
             var node = this.RootNode.Find(command);
 
-            var result = await _system.ActorSelection("user/" + node.Path).Ask(command);
+            var result = await _system.ActorSelection("user/" + node.Path).Ask(new CommandEnvelop(command, context));
 
             return result as CommandResult;
         }
 
-        public async Task<CommandResult> Send(string command, ICommand request)
+        public async Task<CommandResult> Send(string command, ICommand request, ExecutionContext context)
         {
             var node = this.RootNode.Find(command);
 
-            var result = await _system.ActorSelection("user/" + node.Path).Ask(request);
+            var result = await _system.ActorSelection("user/" + node.Path).Ask(new CommandEnvelop(request, context));
 
             return result as CommandResult;
         }
