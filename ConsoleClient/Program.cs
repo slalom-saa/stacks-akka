@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Slalom.Stacks.Search;
 using System.Threading.Tasks;
-using Akka.Actor;
-using Newtonsoft.Json;
-using Slalom.Stacks.Configuration;
-using Autofac;
+using ConsoleClient.Actors;
+using Slalom.Stacks;
 using Slalom.Stacks.Logging;
-using Slalom.Stacks.Messaging.Actors;
-using Slalom.Stacks.Runtime;
+using Slalom.Stacks.Messaging;
 
-namespace Slalom.Stacks.Messaging
+namespace ConsoleClient
 {
     public class Program
     {
@@ -38,20 +34,20 @@ namespace Slalom.Stacks.Messaging
                         stack.SendAsync("items/add-item", "{}"),
                         stack.SendAsync("items/add-item", "{}"),
                         stack.SendAsync("items/add-item", "{}"),
-                        stack.SendAsync("items/add-item", "{}")
+                        stack.SendAsync("items/add-item", "{}"),
+                        stack.SendAsync("items/search", "{}"),
+                        stack.SendAsync("items/search", "{}"),
+                        stack.SendAsync("items/search", "{}"),
+                        stack.SendAsync("items/search", "{}"),
+                        stack.SendAsync("items/search", "{}")
+
+
                     };
 
 
                     await Task.WhenAll(tasks);
 
-                    //system.ActorOf(system.DI().Props<DefaultActorSupervisor>(), "commands");
-
-                    //var result = await system.ActorSelection("user/items/add-item").Ask(new GoCommand());
-
-                    //Console.WriteLine(result);
-
                     Console.WriteLine((await stack.Domain.FindAsync<Item>()).Count());
-
                 }
 
             }

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
+using Slalom.Stacks.Messaging;
 
-namespace Slalom.Stacks.Messaging.Actors
+namespace ConsoleClient.Actors
 {
     [Path("items/add-item")]
     public class AddItemActor : UseCaseActor<GoCommand, GoEvent>

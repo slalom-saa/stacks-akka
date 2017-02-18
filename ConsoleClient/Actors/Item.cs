@@ -1,6 +1,6 @@
 using Slalom.Stacks.Domain;
 
-namespace Slalom.Stacks.Messaging.Actors
+namespace ConsoleClient.Actors
 {
     public class Item : AggregateRoot
     {

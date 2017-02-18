@@ -16,7 +16,7 @@ namespace Slalom.Stacks.Messaging
 
         public AkkaModule(Assembly[] assemblies)
         {
-            _assemblies = assemblies;
+            _assemblies = assemblies.Union(new[] {typeof(AkkaModule).Assembly}).ToArray();
         }
 
         protected override void Load(ContainerBuilder builder)
