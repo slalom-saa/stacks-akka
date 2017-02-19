@@ -8,12 +8,4 @@ namespace ConsoleClient.Actors
     public class GoCommand : Command
     {
     }
-
-    public class SendOnGo : Actor<ItemAddedEvent>
-    {
-        public override void Execute(ItemAddedEvent command)
-        {
-            ///Console.WriteLine(command.ToString());
-        }
-    }
 }

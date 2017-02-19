@@ -12,8 +12,4 @@ namespace ConsoleClient.Actors
             this.AddEvent(new ItemAddedEvent());
         }
     }
-
-    public class ItemAddedEvent : Event
-    {
-    }
 }

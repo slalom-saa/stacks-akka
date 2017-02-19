@@ -6,10 +6,6 @@ using Slalom.Stacks.Messaging;
 
 namespace ConsoleClient.Actors
 {
-    public class SearchCommand : Command
-    {
-    }
-
     [Path("items/search")]
     public class SearchActor : Actor<SearchCommand, string>
     {
