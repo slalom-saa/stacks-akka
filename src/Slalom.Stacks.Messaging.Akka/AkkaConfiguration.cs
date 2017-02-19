@@ -20,14 +20,16 @@ namespace Slalom.Stacks.Messaging
 
                 builder.Register(c => system).AsSelf().SingleInstance();
 
-                builder.Register(c => new AkkaRouter(system, c.Resolve<IComponentContext>()))
+                builder.Register(c => new AkkaMessageRouter(system, c.Resolve<IExecutionContextResolver>()))
                     .OnActivated(c =>
                     {
                         c.Instance.Arrange(instance.Assemblies);
-                    }).SingleInstance().AsSelf().AutoActivate();
-
-                builder.Register(c => new AkkaCommandCoordinator(c.Resolve<AkkaRouter>(), c.Resolve<IExecutionContextResolver>()))
-                    .AsImplementedInterfaces();
+                    }).SingleInstance()
+                    .AsSelf()
+                    .As<IMessageRouter>()
+                    .As<IEventStream>()
+                    .AutoActivate();
+                
 
             });
 

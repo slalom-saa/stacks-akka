@@ -46,7 +46,7 @@ namespace Slalom.Stacks.Messaging.Routing
             return null;
         }
 
-        public AkkaActorNode Find(ICommand command)
+        public AkkaActorNode Find(IMessage command)
         {
             if (this.RequestType == command.GetType())
             {

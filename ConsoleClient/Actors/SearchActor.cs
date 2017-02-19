@@ -11,7 +11,7 @@ namespace ConsoleClient.Actors
     }
 
     [Path("items/search")]
-    public class SearchActor : UseCaseActor<SearchCommand, string>
+    public class SearchActor : Actor<SearchCommand, string>
     {
         public override async Task<string> ExecuteAsync(SearchCommand command)
         {

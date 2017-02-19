@@ -9,6 +9,11 @@ namespace ConsoleClient.Actors
         public Item(string name)
         {
             this.Name = name;
+            this.AddEvent(new ItemAddedEvent());
         }
+    }
+
+    public class ItemAddedEvent : Event
+    {
     }
 }

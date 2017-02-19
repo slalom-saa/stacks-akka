@@ -29,12 +29,12 @@ namespace Slalom.Stacks.Messaging
 
             builder.RegisterAssemblyTypes(_assemblies)
                 .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
-                .AsSelf().PropertiesAutowired(new AllUnsetPropertySelector());
+                .AsSelf().PropertiesAutowired(AllProperties.Instance);
 
             var types = _assemblies.SafelyGetTypes(typeof(IHandle));
             foreach (var type in types)
             {
-                builder.RegisterType(typeof(AkkaHandler<>).MakeGenericType(type))
+                builder.RegisterType(typeof(AkkaActorHost<>).MakeGenericType(type))
                     .AsSelf();
             }
         }

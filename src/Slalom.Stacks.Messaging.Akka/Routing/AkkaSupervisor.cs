@@ -8,7 +8,7 @@ namespace Slalom.Stacks.Messaging.Routing
 {
     public class AkkaSupervisor : ReceiveActor
     {
-        public AkkaRouter UseCaseRouter { get; set; }
+        public AkkaMessageRouter Router { get; set; }
         public IComponentContext ComponentContext { get; set; }
 
         public string Path
@@ -24,7 +24,7 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             base.PreStart();
 
-            var node = this.UseCaseRouter.RootNode.Find(this.Path);
+            var node = this.Router.RootNode.Find(this.Path);
             foreach (var child in node.Nodes)
             {
                 var name = child.Path.Substring(child.Path.LastIndexOf('/') + 1);
@@ -38,11 +38,11 @@ namespace Slalom.Stacks.Messaging.Routing
                     {
                         try
                         {
-                            Context.ActorOf(Context.DI().Props(typeof(AkkaHandler<>).MakeGenericType(child.Type)).WithRouter(FromConfig.Instance), name);
+                            Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost<>).MakeGenericType(child.Type)).WithRouter(FromConfig.Instance), name);
                         }
                         catch
                         {
-                            Context.ActorOf(Context.DI().Props(typeof(AkkaHandler<>).MakeGenericType(child.Type)), name);
+                            Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost<>).MakeGenericType(child.Type)), name);
                         }
                     }
                 }

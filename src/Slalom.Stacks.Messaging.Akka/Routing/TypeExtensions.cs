@@ -8,8 +8,8 @@ namespace Slalom.Stacks.Messaging.Routing
     {
         public static Type GetRequestType(this Type type)
         {
-            var actorType = type.GetBaseTypes().FirstOrDefault(
-                e => e.IsGenericType && e.GetGenericTypeDefinition() == typeof(UseCaseActor<,>));
+            var actorType = type?.GetInterfaces().FirstOrDefault(
+                e => e.IsGenericType && e.GetGenericTypeDefinition() == typeof(IHandle<>));
 
             return actorType != null ? actorType.GetGenericArguments()[0] : null;
         }

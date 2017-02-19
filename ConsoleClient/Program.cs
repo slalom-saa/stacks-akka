@@ -35,13 +35,11 @@ namespace ConsoleClient
                         stack.SendAsync("items/add-item", "{}"),
                         stack.SendAsync("items/add-item", "{}"),
                         stack.SendAsync("items/add-item", "{}"),
-                        stack.SendAsync("items/search", "{}"),
-                        stack.SendAsync("items/search", "{}"),
-                        stack.SendAsync("items/search", "{}"),
-                        stack.SendAsync("items/search", "{}"),
-                        stack.SendAsync("items/search", "{}")
-
-
+                        //stack.SendAsync("items/search", "{}"),
+                        //stack.SendAsync("items/search", "{}"),
+                        //stack.SendAsync("items/search", "{}"),
+                        //stack.SendAsync("items/search", "{}"),
+                        //stack.SendAsync("items/search", "{}")
                     };
 
 

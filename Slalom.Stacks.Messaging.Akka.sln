@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{597124B3-9A03-49AC-AE9B-0C68601DCAFE}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		assets\Package.ps1 = assets\Package.ps1
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Slalom.Stacks.Messaging.Akka", "src\Slalom.Stacks.Messaging.Akka\Slalom.Stacks.Messaging.Akka.xproj", "{A60D63AD-FD7A-414A-80F7-89308D93F817}"
