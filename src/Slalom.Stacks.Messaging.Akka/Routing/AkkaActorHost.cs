@@ -7,11 +7,11 @@ namespace Slalom.Stacks.Messaging.Routing
 {
     public class AkkaActorHost<THandler> : ReceiveActor where THandler : IHandle
     {
-        private readonly ActorSupervisor _supervisor;
+        private readonly MessageCoordinator _supervisor;
 
         private readonly THandler _handler;
 
-        public AkkaActorHost(THandler handler, ActorSupervisor supervisor)
+        public AkkaActorHost(THandler handler, MessageCoordinator supervisor)
         {
             _supervisor = supervisor;
             _handler = handler;
