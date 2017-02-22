@@ -2,26 +2,24 @@ using System;
 using Akka.Actor;
 using System.Linq;
 using System.Threading.Tasks;
+using Slalom.Stacks.Messaging.Pipeline;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaActorHost<THandler> : ReceiveActor where THandler : IHandle
+    public class AkkaActorHost : ReceiveActor
     {
-        private readonly MessageCoordinator _supervisor;
+        public IMessageExecutionPipeline Pipeline { get; set; }
 
-        private readonly THandler _handler;
-
-        public AkkaActorHost(THandler handler, MessageCoordinator supervisor)
+        public AkkaActorHost()
         {
-            _supervisor = supervisor;
-            _handler = handler;
-
             this.ReceiveAsync<MessageEnvelope>(this.HandleCommand);
         }
 
-        private async Task<MessageExecutionResult> HandleCommand(MessageEnvelope envelop)
+        private async Task<MessageResult> HandleCommand(MessageEnvelope envelop)
         {
-            var result = await _supervisor.Execute(envelop, _handler);
+            await this.Pipeline.Execute(envelop.Message, envelop.Context);
+
+            var result = new MessageResult(envelop.Context);
 
             this.Sender.Tell(result);
 

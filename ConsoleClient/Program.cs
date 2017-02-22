@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ConsoleClient.Application.Products.Add;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
@@ -24,29 +24,29 @@ namespace ConsoleClient
             {
                 using (var stack = new Stack(typeof(Program)))
                 {
-                    //stack.UseSimpleConsoleLogging();
-                    //stack.UseAkka("local");
+                    stack.UseSimpleConsoleLogging();
+                    stack.UseAkka("local");
 
-                    //var tasks = new List<Task>
-                    //{
-                    //    //stack.SendAsync("items/add-item", "{}"),
-                    //    //stack.SendAsync("items/add-item", "{}"),
-                    //    //stack.SendAsync("items/add-item", "{}"),
-                    //    //stack.SendAsync("items/add-item", "{}"),
-                    //    //stack.SendAsync("items/add-item", "{}"),
-                    //    ////stack.SendAsync("items/search", "{}"),
-                    //    ////stack.SendAsync("items/search", "{}"),
-                    //    ////stack.SendAsync("items/search", "{}"),
-                    //    ////stack.SendAsync("items/search", "{}"),
-                    //    ////stack.SendAsync("items/search", "{}")
-                    //};
+                    var tasks = new List<Task>
+                    {
+                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        stack.Send("items/add-item", new AddProductCommand("adsf", 15))
+                        ////stack.SendAsync("items/search", "{}"),
+                        ////stack.SendAsync("items/search", "{}"),
+                        ////stack.SendAsync("items/search", "{}"),
+                        ////stack.SendAsync("items/search", "{}"),
+                        ////stack.SendAsync("items/search", "{}")
+                    };
 
 
-                    //await Task.WhenAll(tasks);
+                    await Task.WhenAll(tasks);
 
-                    //Console.WriteLine((await stack.Domain.FindAsync<Item>()).Count());
+                    //Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
                 }
-
             }
             catch (Exception exception)
             {

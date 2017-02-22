@@ -8,9 +8,9 @@ namespace Slalom.Stacks.Messaging.Routing
         public AkkaActorMapping(string path, Type type)
         {
             this.Path = path;
-            if (type.IsGenericType && type.GetInterfaces().Any(e => e == typeof(IHandle)))
+            if (type.IsGenericType && type.GetInterfaces().Any(e => e == typeof(IHandle<>)))
             {
-                this.Type = typeof(AkkaActorHost<>).MakeGenericType(type);
+                this.Type = typeof(AkkaActorHost);
             }
             else
             {

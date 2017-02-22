@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
 using Akka.Routing;
+using Autofac;
 using Newtonsoft.Json;
 using Slalom.Stacks.Domain;
 using Slalom.Stacks.Reflection;
@@ -13,16 +14,18 @@ using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaMessageRouter : IMessageRouter, IEventStream
+    public class AkkaMessageRouter : IRequestRouting
     {
         private readonly ActorSystem _system;
         private readonly IExecutionContextResolver _context;
+        private readonly IComponentContext _components;
         public AkkaActorNode RootNode { get; private set; }
 
-        public AkkaMessageRouter(ActorSystem system, IExecutionContextResolver context)
+        public AkkaMessageRouter(ActorSystem system, IExecutionContextResolver context, IComponentContext components)
         {
             _system = system;
             _context = context;
+            _components = components;
         }
 
         private void PopulateActorNode(AkkaActorNode parent, IEnumerable<AkkaActorMapping> paths)
@@ -64,8 +67,7 @@ namespace Slalom.Stacks.Messaging.Routing
         internal void Arrange(Assembly[] assemblies)
         {
             var items = new List<AkkaActorMapping>();
-            var actors = assemblies.SafelyGetTypes(typeof(IHandle))
-                                   .Union(assemblies.SafelyGetTypes(typeof(ActorBase)));
+            var actors = assemblies.SafelyGetTypes(typeof(IHandle<>));
 
             foreach (var actor in actors)
             {
@@ -86,62 +88,95 @@ namespace Slalom.Stacks.Messaging.Routing
                 {
                     try
                     {
-                        _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost<>).MakeGenericType(child.Type)).WithRouter(FromConfig.Instance), child.Path);
+                        _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), child.Path);
                     }
                     catch
                     {
-                        _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost<>).MakeGenericType(child.Type)), child.Path);
+                        _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)), child.Path);
                     }
                 }
             }
         }
 
-        public Task<MessageExecutionResult> Send(string path, string message, TimeSpan? timeout = null)
+        public class AkkaRequestHandler : IRequestHandler, IUseMessageContext
         {
-            var node = this.RootNode.Find(path);
+            private readonly ActorSystem _system;
+            private readonly string _path;
 
-            var command = (IMessage)JsonConvert.DeserializeObject(message, node.Type.GetRequestType());
+            public AkkaRequestHandler(ActorSystem system, string path)
+            {
+                _system = system;
+                _path = path;
+            }
 
-            return this.Send(command, node);
+            public Task Handle(object instance)
+            {
+                return _system.ActorSelection("user/" + _path).Ask(new MessageEnvelope((IMessage)instance, this.Context));
+            }
+
+            public void SetContext(MessageContext context)
+            {
+                this.Context = context;
+            }
+
+            public MessageContext Context { get; private set; }
         }
 
-        public Task<MessageExecutionResult> Send(IMessage message, TimeSpan? timeout = null)
+        public IEnumerable<Request> BuildRequests(IMessage command)
         {
-            var node = this.RootNode.Find(message);
+            var node = this.RootNode.Find(command);
 
-            return this.Send(message, node, timeout);
+            yield return new Request("asdf", command, new AkkaRequestHandler(_system, node.Path));
         }
 
-        private async Task<MessageExecutionResult> Send(IMessage message, AkkaActorNode node, TimeSpan? timeout = null, ExecutionContext context = null)
-        {
-            context = context ?? _context.Resolve();
+        //public Task<MessageExecutionResult> Send(string path, string message, TimeSpan? timeout = null)
+        //{
+        //    var node = this.RootNode.Find(path);
 
-            var result = await _system.ActorSelection("user/" + node.Path).Ask(new MessageEnvelope(message, context), timeout);
+        //    var command = (IMessage)JsonConvert.DeserializeObject(message, node.Type.GetRequestType());
 
-            return result as MessageExecutionResult;
-        }
+        //    return this.Send(command, node);
+        //}
 
-        public Task<MessageExecutionResult> Send(string path, IMessage message, TimeSpan? timeout = null)
-        {
-            var node = this.RootNode.Find(path);
+        //public Task<MessageExecutionResult> Send(IMessage message, TimeSpan? timeout = null)
+        //{
+        //    var node = this.RootNode.Find(message);
 
-            return this.Send(message, node, timeout);
-        }
+        //    return this.Send(message, node, timeout);
+        //}
 
-        public Task<MessageExecutionResult> Send(string path, TimeSpan? timeout)
-        {
-            var node = this.RootNode.Find(path);
+        //private async Task<MessageResult> Send(IMessage message, AkkaActorNode node, TimeSpan? timeout = null, ExecutionContext context = null)
+        //{
+        //    context = context ?? _context.Resolve();
 
-            var command = (IMessage)JsonConvert.DeserializeObject("{}", node.Type.GetRequestType());
+        //    var request = new RequestHandlerReference(_components.Resolve(node.Type));
+        //    var m = new MessageContext(request, context);
+        //    var result = await _system.ActorSelection("user/" + node.Path).Ask(new RequestEnvelope(new Message("none", message, request), new MessageContext(), timeout);
 
-            return this.Send(command, node);
-        }
+        //    return result as MessageResult;
+        //}
 
-        public void Publish<TEvent>(TEvent instance, ExecutionContext context) where TEvent : Event
-        {
-            var node = this.RootNode.Find(instance);
+        //public Task<MessageExecutionResult> Send(string path, IMessage message, TimeSpan? timeout = null)
+        //{
+        //    var node = this.RootNode.Find(path);
 
-            this.Send(instance, node, context: context);
-        }
+        //    return this.Send(message, node, timeout);
+        //}
+
+        //public Task<MessageExecutionResult> Send(string path, TimeSpan? timeout)
+        //{
+        //    var node = this.RootNode.Find(path);
+
+        //    var command = (IMessage)JsonConvert.DeserializeObject("{}", node.Type.GetRequestType());
+
+        //    return this.Send(command, node);
+        //}
+
+        //public void Publish<TEvent>(TEvent instance, ExecutionContext context) where TEvent : Event
+        //{
+        //    var node = this.RootNode.Find(instance);
+
+        //    this.Send(instance, node, context: context);
+        //}
     }
 }
