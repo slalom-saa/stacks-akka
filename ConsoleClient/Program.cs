@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
+using ConsoleClient.Application.Products.Stock;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
@@ -30,7 +31,14 @@ namespace ConsoleClient
 
                     var tasks = new List<Task>
                     {
-                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new StockProductCommand(15)),
+
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),

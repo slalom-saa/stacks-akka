@@ -36,11 +36,11 @@ namespace Slalom.Stacks.Messaging.Routing
                     }
                     else
                     {
-                    //    try
-                    //    {
-                    //        Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), name);
-                    //    }
-                    //    catch
+                        try
+                        {
+                            Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), name);
+                        }
+                        catch
                         {
                             Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost)), name);
                         }

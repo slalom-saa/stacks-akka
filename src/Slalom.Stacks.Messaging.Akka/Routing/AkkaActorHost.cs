@@ -21,7 +21,7 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             await request.Execute();
 
-            var result = new MessageResult(request.Context);
+            var result = new MessageResult(request);
 
             this.Sender.Tell(result);
 

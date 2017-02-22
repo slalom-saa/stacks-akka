@@ -91,11 +91,11 @@ namespace Slalom.Stacks.Messaging.Routing
                 }
                 else
                 {
-                    //try
-                    //{
-                    //    _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), child.Path);
-                    //}
-                    //catch
+                    try
+                    {
+                        _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), child.Path);
+                    }
+                    catch
                     {
                         _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)), child.Path);
                     }
@@ -115,7 +115,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
             await _system.ActorSelection("user/" + node.Path).Ask(requests.First());
 
-            return new MessageResult(requests.First().Context);
+            return new MessageResult(requests.First());
         }
 
         public Task Publish(IEvent instance, MessageContext context = null)
