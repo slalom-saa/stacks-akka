@@ -115,7 +115,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
             await _system.ActorSelection("user/" + node.Path).Ask(requests.First());
 
-            return new MessageResult(context);
+            return new MessageResult(requests.First().Context);
         }
 
         public Task Publish(IEvent instance, MessageContext context = null)
