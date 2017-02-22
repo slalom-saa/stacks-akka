@@ -91,11 +91,11 @@ namespace Slalom.Stacks.Messaging.Routing
                 }
                 else
                 {
-                    try
-                    {
-                        _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), child.Path);
-                    }
-                    catch
+                    //try
+                    //{
+                    //    _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)).WithRouter(FromConfig.Instance), child.Path);
+                    //}
+                    //catch
                     {
                         _system.ActorOf(_system.DI().Props(typeof(AkkaActorHost)), child.Path);
                     }
@@ -111,13 +111,9 @@ namespace Slalom.Stacks.Messaging.Routing
                 throw new Exception("TBD");
             }
 
-            context = new MessageContext(requests.Single(), _executionContext.Resolve(), context);
-
-            //await requests.First().Recipient.Handle(instance, context);
-
             var node = this.RootNode.Find(instance);
 
-            await _system.ActorSelection("user/" + node.Path).Ask(new MessageEnvelope(requests.First(), context, node));
+            await _system.ActorSelection("user/" + node.Path).Ask(requests.First());
 
             return new MessageResult(context);
         }
@@ -129,10 +125,9 @@ namespace Slalom.Stacks.Messaging.Routing
             {
                 var node = this.RootNode.Find(request.Message);
 
-                var current = new MessageContext(request, _executionContext.Resolve(), context);
-
-                _system.ActorSelection("user/" + node.Path).Tell(new MessageEnvelope(request, current, node));
+                _system.ActorSelection("user/" + node.Path).Tell(request);
             }
+
             return Task.FromResult(0);
         }
 

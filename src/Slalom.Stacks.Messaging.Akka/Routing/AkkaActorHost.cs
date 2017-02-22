@@ -14,14 +14,14 @@ namespace Slalom.Stacks.Messaging.Routing
 
         public AkkaActorHost()
         {
-            this.ReceiveAsync<MessageEnvelope>(this.HandleCommand);
+            this.ReceiveAsync<Request>(this.HandleCommand);
         }
 
-        private async Task<MessageResult> HandleCommand(MessageEnvelope envelope)
+        private async Task<MessageResult> HandleCommand(Request request)
         {
-            await envelope.Message.Recipient.Handle(envelope.Message.Message, envelope.Context);
+            await request.Execute();
 
-            var result = new MessageResult(envelope.Context);
+            var result = new MessageResult(request.Context);
 
             this.Sender.Tell(result);
 

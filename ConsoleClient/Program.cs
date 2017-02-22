@@ -47,6 +47,7 @@ namespace ConsoleClient
                     await Task.WhenAll(tasks);
 
                     //Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
+
                     Console.ReadLine();
                     Console.WriteLine("....");
                 }
