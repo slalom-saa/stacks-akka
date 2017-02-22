@@ -29,7 +29,9 @@ namespace Slalom.Stacks.Messaging
 
             builder.RegisterAssemblyTypes(_assemblies)
                 .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
-                .AsSelf().PropertiesAutowired(AllProperties.Instance);
+                .AsSelf()
+                .PropertiesAutowired();
+
         }
     }
 }

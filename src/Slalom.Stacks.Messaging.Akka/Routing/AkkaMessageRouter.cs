@@ -14,11 +14,14 @@ using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaMessageRouter : IRequestRouting
+    public class AkkaMessageRouter : IMessageStream
     {
         private readonly ActorSystem _system;
         private readonly IExecutionContextResolver _context;
         private readonly IComponentContext _components;
+        private IRequestRouting _routing;
+        private IExecutionContextResolver _executionContext;
+
         public AkkaActorNode RootNode { get; private set; }
 
         public AkkaMessageRouter(ActorSystem system, IExecutionContextResolver context, IComponentContext components)
@@ -26,6 +29,8 @@ namespace Slalom.Stacks.Messaging.Routing
             _system = system;
             _context = context;
             _components = components;
+            _routing = _components.Resolve<IRequestRouting>();
+            _executionContext = _components.Resolve<IExecutionContextResolver>();
         }
 
         private void PopulateActorNode(AkkaActorNode parent, IEnumerable<AkkaActorMapping> paths)
@@ -98,36 +103,55 @@ namespace Slalom.Stacks.Messaging.Routing
             }
         }
 
-        public class AkkaRequestHandler : IRequestHandler, IUseMessageContext
+        public async Task<MessageResult> Send(ICommand instance, MessageContext context = null, TimeSpan? timeout = null)
         {
-            private readonly ActorSystem _system;
-            private readonly string _path;
-
-            public AkkaRequestHandler(ActorSystem system, string path)
+            var requests = _routing.BuildRequests(instance).ToList();
+            if (requests.Count() != 1)
             {
-                _system = system;
-                _path = path;
+                throw new Exception("TBD");
             }
 
-            public Task Handle(object instance)
-            {
-                return _system.ActorSelection("user/" + _path).Ask(new MessageEnvelope((IMessage)instance, this.Context));
-            }
+            context = new MessageContext(requests.Single(), _executionContext.Resolve(), context);
 
-            public void SetContext(MessageContext context)
-            {
-                this.Context = context;
-            }
+            //await requests.First().Recipient.Handle(instance, context);
 
-            public MessageContext Context { get; private set; }
+            var node = this.RootNode.Find(instance);
+
+            await _system.ActorSelection("user/" + node.Path).Ask(new MessageEnvelope(requests.First(), context, node));
+
+            return new MessageResult(context);
         }
 
-        public IEnumerable<Request> BuildRequests(IMessage command)
+        public Task Publish(IEvent instance, MessageContext context = null)
         {
-            var node = this.RootNode.Find(command);
+            var requests = _routing.BuildRequests(instance).ToList();
+            foreach (var request in requests)
+            {
+                var node = this.RootNode.Find(request.Message);
 
-            yield return new Request("asdf", command, new AkkaRequestHandler(_system, node.Path));
+                var current = new MessageContext(request, _executionContext.Resolve(), context);
+
+                _system.ActorSelection("user/" + node.Path).Tell(new MessageEnvelope(request, current, node));
+            }
+            return Task.FromResult(0);
         }
+
+        public async Task Publish(IEnumerable<IEvent> instance, MessageContext context = null)
+        {
+            foreach (var @event in instance)
+            {
+                await this.Publish(@event, context);
+            }
+        }
+
+       
+
+        //public IEnumerable<Request> BuildRequests(IMessage command)
+        //{
+        //    var node = this.RootNode.Find(command);
+
+        //    yield return new Request("asdf", command, new AkkaRequestHandler(_system, node));
+        //}
 
         //public Task<MessageExecutionResult> Send(string path, string message, TimeSpan? timeout = null)
         //{

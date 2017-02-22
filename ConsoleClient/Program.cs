@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Autofac;
 using ConsoleClient.Application.Products.Add;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
@@ -30,11 +31,11 @@ namespace ConsoleClient
                     var tasks = new List<Task>
                     {
                         stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        stack.Send("items/add-item", new AddProductCommand("adsf", 15))
+                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
+                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15))
                         ////stack.SendAsync("items/search", "{}"),
                         ////stack.SendAsync("items/search", "{}"),
                         ////stack.SendAsync("items/search", "{}"),
@@ -46,6 +47,8 @@ namespace ConsoleClient
                     await Task.WhenAll(tasks);
 
                     //Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
+                    Console.ReadLine();
+                    Console.WriteLine("....");
                 }
             }
             catch (Exception exception)

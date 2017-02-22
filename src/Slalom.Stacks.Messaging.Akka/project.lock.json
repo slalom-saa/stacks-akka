@@ -72,7 +72,7 @@
           "lib/net45/Akka.Serialization.Hyperion.dll": {}
         }
       },
-      "Autofac/4.2.1": {
+      "Autofac/4.3.0": {
         "type": "package",
         "compile": {
           "lib/net45/Autofac.dll": {}
@@ -241,18 +241,6 @@
         },
         "runtime": {
           "lib/net451/Microsoft.Extensions.Configuration.Json.dll": {}
-        }
-      },
-      "Microsoft.Extensions.Configuration.UserSecrets/1.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Configuration.Json": "1.0.0"
-        },
-        "compile": {
-          "lib/net451/Microsoft.Extensions.Configuration.UserSecrets.dll": {}
-        },
-        "runtime": {
-          "lib/net451/Microsoft.Extensions.Configuration.UserSecrets.dll": {}
         }
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions/1.1.0": {
@@ -425,10 +413,10 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "Slalom.Stacks/1.4.0": {
+      "Slalom.Stacks/1.4.4": {
         "type": "package",
         "dependencies": {
-          "Autofac": "4.2.1",
+          "Autofac": "4.3.0",
           "Autofac.Extensions.DependencyInjection": "4.0.0",
           "Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
           "Microsoft.Extensions.Configuration": "1.1.0",
@@ -437,7 +425,6 @@
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.1.0",
           "Microsoft.Extensions.Configuration.FileExtensions": "1.1.0",
           "Microsoft.Extensions.Configuration.Json": "1.1.0",
-          "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
           "Microsoft.Extensions.DependencyModel": "1.1.0",
           "Microsoft.Extensions.PlatformAbstractions": "1.1.0",
@@ -446,7 +433,7 @@
           "System.Diagnostics.Process": "4.3.0",
           "System.Linq": "4.3.0",
           "System.Linq.Expressions": "4.3.0",
-          "System.Linq.Queryable": "4.0.0",
+          "System.Linq.Queryable": "4.3.0",
           "System.Net.NameResolution": "4.3.0",
           "System.Net.NetworkInformation": "4.1.0",
           "System.Security.Claims": "4.3.0",
@@ -747,8 +734,11 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Linq.Queryable/4.0.0": {
+      "System.Linq.Queryable/4.3.0": {
         "type": "package",
+        "frameworkAssemblies": [
+          "System.Core"
+        ],
         "compile": {
           "ref/net45/_._": {}
         },
@@ -1267,13 +1257,13 @@
         "lib/net45/Akka.Serialization.Hyperion.dll"
       ]
     },
-    "Autofac/4.2.1": {
-      "sha512": "mLXJziTZPIt7R6m8SmPIOjMTd4k8Ok9L21j4yFniyA8AogHxEL2XburSwElJLmGU5KsgeMkpuTI22S3GSOeLqQ==",
+    "Autofac/4.3.0": {
+      "sha512": "fCrt0EBW99+q1R6iA3+JBYmtfCDYfMHzsAtaDZ8/kbq9tW+Ze5W8SrxwTHqpbPI4Cp4/0NeJDaODD+D3cOfdHQ==",
       "type": "package",
-      "path": "Autofac/4.2.1",
+      "path": "Autofac/4.3.0",
       "files": [
-        "Autofac.4.2.1.nupkg.sha512",
-        "Autofac.nuspec",
+        "autofac.4.3.0.nupkg.sha512",
+        "autofac.nuspec",
         "lib/net45/Autofac.dll",
         "lib/net45/Autofac.xml",
         "lib/netstandard1.1/Autofac.dll",
@@ -1553,19 +1543,6 @@
         "lib/netstandard1.3/Microsoft.Extensions.Configuration.Json.xml"
       ]
     },
-    "Microsoft.Extensions.Configuration.UserSecrets/1.0.0": {
-      "sha512": "2d4ycB89yzoDR40kfoK7iSCrW67mExz4RLm84JFDcgOoMYr1K4vgWjfL2YUjXqjKVNBi6USwhIDkCKXRYWLQ2Q==",
-      "type": "package",
-      "path": "Microsoft.Extensions.Configuration.UserSecrets/1.0.0",
-      "files": [
-        "Microsoft.Extensions.Configuration.UserSecrets.1.0.0.nupkg.sha512",
-        "Microsoft.Extensions.Configuration.UserSecrets.nuspec",
-        "lib/net451/Microsoft.Extensions.Configuration.UserSecrets.dll",
-        "lib/net451/Microsoft.Extensions.Configuration.UserSecrets.xml",
-        "lib/netstandard1.3/Microsoft.Extensions.Configuration.UserSecrets.dll",
-        "lib/netstandard1.3/Microsoft.Extensions.Configuration.UserSecrets.xml"
-      ]
-    },
     "Microsoft.Extensions.DependencyInjection.Abstractions/1.1.0": {
       "sha512": "2luhjVaWZd8Wmr2KUJcLNAN+iZgezTyfamLG6Lo5FVYY1LYaS7UFOmNtApHGVIytWWtuXSk4ea0t2Vx0HgF5fg==",
       "type": "package",
@@ -1734,12 +1711,12 @@
         "tools/install.ps1"
       ]
     },
-    "Slalom.Stacks/1.4.0": {
-      "sha512": "QOuICbRLzcdZjVlljMejB1VMGUTD56V0y/jI7ErIWZZKlb9oQWpDi4einlo2zcwS+/JkohVYFEJSkuH1l1S3pA==",
+    "Slalom.Stacks/1.4.4": {
+      "sha512": "/DbCofJ8SD434+LNwetJsdfo7Qabh9EmhCtYXZIUH4DSjFosnVCtDtoqS87dxxBvuliWbondCu0ednjK+JFklw==",
       "type": "package",
-      "path": "Slalom.Stacks/1.4.0",
+      "path": "Slalom.Stacks/1.4.4",
       "files": [
-        "Slalom.Stacks.1.4.0.nupkg.sha512",
+        "Slalom.Stacks.1.4.4.nupkg.sha512",
         "Slalom.Stacks.nuspec",
         "Tools/init.ps1",
         "lib/Newtonsoft.Json.dll",
@@ -2922,36 +2899,61 @@
         "runtimes/aot/lib/netcore50/System.Linq.Expressions.dll"
       ]
     },
-    "System.Linq.Queryable/4.0.0": {
-      "sha512": "DIlvCNn3ucFvwMMzXcag4aFnFJ1fdxkQ5NqwJe9Nh7y8ozzhDm07YakQL/yoF3P1dLzY1T2cTpuwbAmVSdXyBA==",
+    "System.Linq.Queryable/4.3.0": {
+      "sha512": "In1Bmmvl/j52yPu3xgakQSI0YIckPUr870w4K5+Lak3JCCa8hl+my65lABOuKfYs4ugmZy25ScFerC4nz8+b6g==",
       "type": "package",
-      "path": "System.Linq.Queryable/4.0.0",
+      "path": "System.Linq.Queryable/4.3.0",
       "files": [
-        "System.Linq.Queryable.4.0.0.nupkg.sha512",
+        "System.Linq.Queryable.4.3.0.nupkg.sha512",
         "System.Linq.Queryable.nuspec",
-        "lib/dotnet/System.Linq.Queryable.dll",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/monoandroid10/_._",
+        "lib/monotouch10/_._",
         "lib/net45/_._",
         "lib/netcore50/System.Linq.Queryable.dll",
+        "lib/netstandard1.3/System.Linq.Queryable.dll",
+        "lib/portable-net45+win8+wp8+wpa81/_._",
         "lib/win8/_._",
         "lib/wp80/_._",
         "lib/wpa81/_._",
-        "ref/dotnet/System.Linq.Queryable.dll",
-        "ref/dotnet/System.Linq.Queryable.xml",
-        "ref/dotnet/de/System.Linq.Queryable.xml",
-        "ref/dotnet/es/System.Linq.Queryable.xml",
-        "ref/dotnet/fr/System.Linq.Queryable.xml",
-        "ref/dotnet/it/System.Linq.Queryable.xml",
-        "ref/dotnet/ja/System.Linq.Queryable.xml",
-        "ref/dotnet/ko/System.Linq.Queryable.xml",
-        "ref/dotnet/ru/System.Linq.Queryable.xml",
-        "ref/dotnet/zh-hans/System.Linq.Queryable.xml",
-        "ref/dotnet/zh-hant/System.Linq.Queryable.xml",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/monoandroid10/_._",
+        "ref/monotouch10/_._",
         "ref/net45/_._",
         "ref/netcore50/System.Linq.Queryable.dll",
         "ref/netcore50/System.Linq.Queryable.xml",
+        "ref/netcore50/de/System.Linq.Queryable.xml",
+        "ref/netcore50/es/System.Linq.Queryable.xml",
+        "ref/netcore50/fr/System.Linq.Queryable.xml",
+        "ref/netcore50/it/System.Linq.Queryable.xml",
+        "ref/netcore50/ja/System.Linq.Queryable.xml",
+        "ref/netcore50/ko/System.Linq.Queryable.xml",
+        "ref/netcore50/ru/System.Linq.Queryable.xml",
+        "ref/netcore50/zh-hans/System.Linq.Queryable.xml",
+        "ref/netcore50/zh-hant/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/System.Linq.Queryable.dll",
+        "ref/netstandard1.0/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/de/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/es/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/fr/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/it/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/ja/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/ko/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/ru/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/zh-hans/System.Linq.Queryable.xml",
+        "ref/netstandard1.0/zh-hant/System.Linq.Queryable.xml",
+        "ref/portable-net45+win8+wp8+wpa81/_._",
         "ref/win8/_._",
         "ref/wp80/_._",
-        "ref/wpa81/_._"
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._"
       ]
     },
     "System.Net.Http/4.3.0": {
@@ -4753,7 +4755,7 @@
       "Akka.DI.Core >= 1.1.3",
       "Akka.Remote >= 1.1.3",
       "Akka.Serialization.Hyperion >= 1.1.3.32-beta",
-      "Slalom.Stacks >= 1.4.0"
+      "Slalom.Stacks >= 1.4.4"
     ],
     ".NETFramework,Version=v4.6.1": []
   },

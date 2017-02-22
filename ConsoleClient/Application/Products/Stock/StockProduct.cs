@@ -1,4 +1,6 @@
-﻿using Slalom.Stacks.Messaging;
+﻿using System;
+using System.Linq;
+using Slalom.Stacks.Messaging;
 
 namespace ConsoleClient.Application.Products.Stock
 {
