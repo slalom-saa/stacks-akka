@@ -26,8 +26,9 @@ namespace Slalom.Stacks.Messaging
                         c.Instance.Arrange(instance.Assemblies);
                     }).SingleInstance()
                     .AsSelf()
-                    .As<IMessageStream>()
+                    .As<IMessageDispatcher>()
                     .AutoActivate();
+
             });
 
             return instance;

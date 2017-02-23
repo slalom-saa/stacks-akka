@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Slalom.Stacks.Messaging.Pipeline;
+using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
@@ -14,18 +15,22 @@ namespace Slalom.Stacks.Messaging.Routing
 
         public AkkaActorHost()
         {
-            this.ReceiveAsync<Request>(this.HandleCommand);
+           this.ReceiveAsync<AkkaRequest>(this.HandleCommand);
         }
 
-        private async Task<MessageResult> HandleCommand(Request request)
+        private async Task HandleCommand(AkkaRequest request)
         {
-            await request.Execute();
+            var handler = this.Components.Resolve(typeof(IHandle<>).MakeGenericType(request.Message.GetType()));
 
-            var result = new MessageResult(request);
+            var executionContext = this.Components.Resolve<IExecutionContextResolver>().Resolve();
+            var context = new MessageContext(request.Message.Id, handler.GetType().Name, null, executionContext, request.Context);
+            if (handler is IUseMessageContext)
+            {
+                ((IUseMessageContext)handler).UseContext(context);
+            }
+            await (Task)typeof(IHandle<>).MakeGenericType(request.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { request.Message });
 
-            this.Sender.Tell(result);
-
-            return result;
+            this.Sender.Tell(new MessageResult(context));
         }
     }
 }

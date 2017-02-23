@@ -14,12 +14,23 @@ using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaMessageRouter : IMessageStream
+    public class AkkaRequest
+    {
+        public IMessage Message { get; }
+        public MessageContext Context { get; }
+
+        public AkkaRequest(IMessage message, MessageContext context = null)
+        {
+            this.Message = message;
+            this.Context = context;
+        }
+    }
+
+    public class AkkaMessageRouter : IMessageDispatcher
     {
         private readonly ActorSystem _system;
         private readonly IExecutionContextResolver _context;
         private readonly IComponentContext _components;
-        private IRequestRouting _routing;
         private IExecutionContextResolver _executionContext;
 
         public AkkaActorNode RootNode { get; private set; }
@@ -29,7 +40,6 @@ namespace Slalom.Stacks.Messaging.Routing
             _system = system;
             _context = context;
             _components = components;
-            _routing = _components.Resolve<IRequestRouting>();
             _executionContext = _components.Resolve<IExecutionContextResolver>();
         }
 
@@ -105,28 +115,34 @@ namespace Slalom.Stacks.Messaging.Routing
 
         public async Task<MessageResult> Send(ICommand instance, MessageContext context = null, TimeSpan? timeout = null)
         {
-            var requests = _routing.BuildRequests(instance).ToList();
-            if (requests.Count() != 1)
+            var handler = _components.Resolve(typeof(IHandle<>).MakeGenericType(instance.GetType()));
+
+            var executionContext = _components.Resolve<IExecutionContextResolver>().Resolve();
+            context = new MessageContext(instance.Id, handler.GetType().Name, null, executionContext, context);
+
+            if (handler is IUseMessageContext)
             {
-                throw new Exception("TBD");
+                ((IUseMessageContext)handler).UseContext(context);
             }
+
+            await (Task)typeof(IHandle<>).MakeGenericType(instance.GetType()).GetMethod("Handle").Invoke(handler, new object[] { instance });
 
             var node = this.RootNode.Find(instance);
 
-            await _system.ActorSelection("user/" + node.Path).Ask(requests.First());
+            var result = await _system.ActorSelection("user/" + node.Path).Ask(new AkkaRequest(instance, context), timeout);
 
-            return new MessageResult(requests.First());
+            return result as MessageResult;
         }
 
         public Task Publish(IEvent instance, MessageContext context = null)
         {
-            var requests = _routing.BuildRequests(instance).ToList();
-            foreach (var request in requests)
-            {
-                var node = this.RootNode.Find(request.Message);
+            //var requests = _routing.BuildRequests(instance).ToList();
+            //foreach (var request in requests)
+            //{
+            //    var node = this.RootNode.Find(request.Message);
 
-                _system.ActorSelection("user/" + node.Path).Tell(request);
-            }
+            //    _system.ActorSelection("user/" + node.Path).Tell(request);
+            //}
 
             return Task.FromResult(0);
         }
