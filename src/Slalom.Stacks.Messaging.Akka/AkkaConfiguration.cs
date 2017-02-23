@@ -21,13 +21,8 @@ namespace Slalom.Stacks.Messaging
                 builder.Register(c => system).AsSelf().SingleInstance();
 
                 builder.Register(c => new AkkaMessageDispatcher(system, c.Resolve<IComponentContext>()))
-                    .OnActivated(c =>
-                    {
-                        c.Instance.Arrange(instance.Assemblies);
-                    }).SingleInstance()
-                    .AsSelf()
-                    .As<IMessageDispatcher>()
-                    .AutoActivate();
+                       .As<IMessageDispatcher>()
+                       .SingleInstance();
 
             });
 

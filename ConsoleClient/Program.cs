@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
-using ConsoleClient.Application.Products.Stock;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Messaging.Routing;
 
 namespace ConsoleClient
 {
@@ -19,7 +19,6 @@ namespace ConsoleClient
             Console.ReadLine();
         }
 
-
         private static async Task Start()
         {
             try
@@ -29,15 +28,21 @@ namespace ConsoleClient
                     stack.UseSimpleConsoleLogging();
                     stack.UseAkka("local");
 
+                    stack.Use(builder =>
+                    {
+                        builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
+                        builder.RegisterGeneric(typeof(AkkaActorHost<,>));
+                    });
+
                     var tasks = new List<Task>
                     {
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+
+                        stack.Send("items/add-item", new AddProductCommand("asdf", 20))
 
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
@@ -50,7 +55,6 @@ namespace ConsoleClient
                         ////stack.SendAsync("items/search", "{}"),
                         ////stack.SendAsync("items/search", "{}")
                     };
-
 
                     await Task.WhenAll(tasks);
 

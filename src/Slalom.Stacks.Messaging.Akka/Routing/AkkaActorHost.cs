@@ -9,28 +9,27 @@ using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaActorHost : ReceiveActor
+    public class AkkaActorHost<THandler, TMessage> : ReceiveActor where THandler : IHandle<TMessage>
     {
-        public IComponentContext Components { get; set; }
+        private readonly THandler _handler;
 
-        public AkkaActorHost()
+        public AkkaActorHost(THandler handler)
         {
-           this.ReceiveAsync<AkkaRequest>(this.HandleCommand);
+            _handler = handler;
+
+            this.ReceiveAsync<AkkaRequest>(this.Execute);
         }
 
-        private async Task HandleCommand(AkkaRequest request)
+        private async Task Execute(AkkaRequest request)
         {
-            var handler = this.Components.Resolve(typeof(IHandle<>).MakeGenericType(request.Message.GetType()));
-
-            var executionContext = this.Components.Resolve<IExecutionContextResolver>().Resolve();
-            var context = new MessageContext(request.Message.Id, handler.GetType().Name, null, executionContext, request.Context);
-            if (handler is IUseMessageContext)
+            if (_handler is IUseMessageContext)
             {
-                ((IUseMessageContext)handler).UseContext(context);
+                ((IUseMessageContext)_handler).UseContext(request.Context);
             }
-            await (Task)typeof(IHandle<>).MakeGenericType(request.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { request.Message });
 
-            this.Sender.Tell(new MessageResult(context));
+            await _handler.Handle((TMessage)request.Message);
+
+            this.Sender.Tell(new MessageResult(request.Context));
         }
     }
 }
