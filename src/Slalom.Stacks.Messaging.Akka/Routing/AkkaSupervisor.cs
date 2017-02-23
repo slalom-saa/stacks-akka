@@ -8,7 +8,7 @@ namespace Slalom.Stacks.Messaging.Routing
 {
     public class AkkaSupervisor : ReceiveActor
     {
-        public AkkaMessageRouter Router { get; set; }
+        public AkkaMessageDispatcher Dispatcher { get; set; }
         public IComponentContext ComponentContext { get; set; }
 
         public string Path
@@ -24,7 +24,7 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             base.PreStart();
 
-            var node = this.Router.RootNode.Find(this.Path);
+            var node = this.Dispatcher.RootNode.Find(this.Path);
             foreach (var child in node.Nodes)
             {
                 var name = child.Path.Substring(child.Path.LastIndexOf('/') + 1);
