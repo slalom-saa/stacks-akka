@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Autofac;
 using ConsoleClient.Application.Products.Add;
-using ConsoleClient.Application.Products.Stock;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Messaging.Routing;
 
 namespace ConsoleClient
 {
+    [Path("products")]
+    public class ProductsCommandCoordinator : CommandCoordinator
+    {
+        protected override void PreStart()
+        {
+            base.PreStart();
+        }
+    }
+
     public class Program
     {
         public static void Main(string[] args)
@@ -18,7 +26,6 @@ namespace ConsoleClient
             Start();
             Console.ReadLine();
         }
-
 
         private static async Task Start()
         {
@@ -29,28 +36,27 @@ namespace ConsoleClient
                     stack.UseSimpleConsoleLogging();
                     stack.UseAkka("local");
 
+
                     var tasks = new List<Task>
                     {
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
-                        stack.Send("items/add-item", new StockProductCommand(15)),
+                        stack.Send("products/add", new AddProductCommand("adfa", 15)),
+                        stack.Send("products/add", new AddProductCommand("adfa", 15)),
+
+                        //stack.Send("items/add-item", new AddProductCommand("adfa", 15)),
+                        //stack.Send("items/add-item", new AddProductCommand("adfa", 15)),
+                        //stack.Send("items/add-item", new AddProductCommand("adfa", 15))
 
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15))
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}")
-                    };
 
+                        stack.Send("products/search", "{}"),
+                        stack.Send("products/search", "{}"),
+                        stack.Send("products/search", "{}"),
+                        stack.Send("products/search", "{}")
+                    };
 
                     await Task.WhenAll(tasks);
 

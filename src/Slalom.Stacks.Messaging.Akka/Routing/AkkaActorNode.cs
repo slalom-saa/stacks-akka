@@ -9,9 +9,7 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             this.Path = path;
             this.Type = type;
-            
             this.RequestType = type.GetRequestType();
-           
         }
 
         public List<AkkaActorNode> Nodes { get; } = new List<AkkaActorNode>();

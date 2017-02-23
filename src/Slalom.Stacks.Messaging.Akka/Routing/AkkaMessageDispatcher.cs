@@ -66,7 +66,8 @@ namespace Slalom.Stacks.Messaging.Routing
         internal void Arrange(Assembly[] assemblies)
         {
             var items = new List<AkkaActorMapping>();
-            var actors = assemblies.SafelyGetTypes(typeof(IHandle<>));
+            var actors = assemblies.SafelyGetTypes(typeof(IHandle<>))
+                                   .Union(assemblies.SafelyGetTypes(typeof(ActorBase)));
 
             foreach (var actor in actors)
             {
@@ -83,7 +84,11 @@ namespace Slalom.Stacks.Messaging.Routing
             {
                 if (child.Type == null)
                 {
-                    _system.ActorOf(_system.DI().Props<AkkaSupervisor>(), child.Path);
+                    _system.ActorOf(_system.DI().Props<CommandCoordinator>(), child.Path);
+                }
+                else if (child.RequestType == null)
+                {
+                    _system.ActorOf(_system.DI().Props(child.Type), child.Path);
                 }
                 else
                 {
@@ -101,6 +106,13 @@ namespace Slalom.Stacks.Messaging.Routing
 
         public async Task<MessageResult> Send(ICommand instance, MessageContext context = null, TimeSpan? timeout = null)
         {
+            var node = this.RootNode.Find(instance);
+
+            return await this.Execute(instance, context, timeout, node);
+        }
+
+        private async Task<MessageResult> Execute(ICommand instance, MessageContext context, TimeSpan? timeout, AkkaActorNode node)
+        {
             var handler = _components.Resolve(typeof(IHandle<>).MakeGenericType(instance.GetType()));
 
             var executionContext = _components.Resolve<IExecutionContextResolver>().Resolve();
@@ -110,10 +122,6 @@ namespace Slalom.Stacks.Messaging.Routing
             {
                 ((IUseMessageContext)handler).UseContext(context);
             }
-
-           // await (Task)typeof(IHandle<>).MakeGenericType(instance.GetType()).GetMethod("Handle").Invoke(handler, new object[] { instance });
-
-            var node = this.RootNode.Find(instance);
 
             var result = await _system.ActorSelection("user/" + node.Path).Ask(new AkkaRequest(instance, context), timeout);
 
@@ -148,7 +156,20 @@ namespace Slalom.Stacks.Messaging.Routing
             }
         }
 
-       
+        public async Task<MessageResult> Send(string path, ICommand instance, MessageContext context = null, TimeSpan? timeout = null)
+        {
+            var node = this.RootNode.Find(path);
+
+            return await this.Execute(instance, context, timeout, node);
+        }
+
+        public Task<MessageResult> Send(string path, string command, MessageContext context = null, TimeSpan? timeout = null)
+        {
+            var node = this.RootNode.Find(path);
+            var instance = (ICommand)JsonConvert.DeserializeObject(command, node.RequestType);
+
+            return this.Execute(instance, context, timeout, node);
+        }
 
         //public IEnumerable<Request> BuildRequests(IMessage command)
         //{

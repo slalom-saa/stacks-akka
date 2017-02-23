@@ -6,7 +6,7 @@ using Autofac;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaSupervisor : ReceiveActor
+    public class CommandCoordinator : ReceiveActor
     {
         public AkkaMessageDispatcher Dispatcher { get; set; }
         public IComponentContext ComponentContext { get; set; }
@@ -32,7 +32,11 @@ namespace Slalom.Stacks.Messaging.Routing
                 {
                     if (child.Type == null)
                     {
-                        Context.ActorOf(Context.DI().Props<AkkaSupervisor>(), name);
+                        Context.ActorOf(Context.DI().Props<CommandCoordinator>(), name);
+                    }
+                    else if (child.RequestType == null)
+                    {
+                        Context.ActorOf(Context.DI().Props(child.Type), child.Path);
                     }
                     else
                     {
