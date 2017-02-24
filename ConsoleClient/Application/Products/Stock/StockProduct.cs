@@ -10,7 +10,7 @@ namespace ConsoleClient.Application.Products.Stock
     {
         public override async Task ExecuteAsync(StockProductCommand command)
         {
-            await Task.Delay(500);
+            //await Task.Delay(500);
         }
     }
 }

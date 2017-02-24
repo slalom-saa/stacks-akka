@@ -3,13 +3,28 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
+using ConsoleClient.Aspects;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Routing;
 
 namespace ConsoleClient
 {
+    //[Path("products")]
+    //public class AC : CommandCoordinator
+    //{
+    //    public AC(IComponentContext components) : base(components)
+    //    {
+    //    }
+    //    protected override bool Execute(AkkaRequest request)
+    //    {
+    //        Console.WriteLine(request.Message.GetType());
+    //        return base.Execute(request);
+    //    }
+    //}
+
     public class Program
     {
         public static void Main(string[] args)
@@ -25,24 +40,28 @@ namespace ConsoleClient
             {
                 using (var stack = new Stack(typeof(Program)))
                 {
-                    stack.UseSimpleConsoleLogging();
+                    //stack.UseSimpleConsoleLogging();
                     stack.UseAkka("local");
 
                     stack.Use(builder =>
                     {
                         builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
                         builder.RegisterGeneric(typeof(AkkaActorHost<,>));
+                        builder.Register(c => new LocalRegistry(stack.Assemblies)).AsSelf();
+                        //builder.RegisterType<RequestStore>().As<IRequestStore>();
                     });
 
                     var tasks = new List<Task>
                     {
-                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
-                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
-                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
-                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
-                        stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20))
+                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
 
-                        stack.Send("items/add-item", new AddProductCommand("asdf", 20))
+                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20))
 
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
                         //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
@@ -57,11 +76,15 @@ namespace ConsoleClient
                     };
 
                     await Task.WhenAll(tasks);
+                    //foreach (var item in tasks)
+                    //{
+                    //    Console.WriteLine(item.Exception == null);   
+                    //}
 
                     //Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
 
+                    Console.WriteLine("...");
                     Console.ReadLine();
-                    Console.WriteLine("....");
                 }
             }
             catch (Exception exception)
