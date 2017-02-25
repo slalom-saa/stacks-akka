@@ -7,7 +7,7 @@ namespace ConsoleClient.Aspects
 {
     public class RequestStore : IRequestStore
     {
-        public Task AppendAsync(RequestEntry entry)
+        public Task Append(RequestEntry entry)
         {
             Console.WriteLine(JsonConvert.SerializeObject(entry, Formatting.Indented));
 

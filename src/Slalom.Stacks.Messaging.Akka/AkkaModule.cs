@@ -30,7 +30,10 @@ namespace Slalom.Stacks.Messaging
             builder.RegisterAssemblyTypes(_assemblies)
                 .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
                 .AsSelf()
+                .InstancePerDependency()
                 .PropertiesAutowired();
+
+            builder.RegisterGeneric(typeof(AkkaActorHost<,>));
 
         }
     }

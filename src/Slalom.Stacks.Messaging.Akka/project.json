@@ -26,7 +26,7 @@
     "Akka.DI.Core": "1.1.3",
     "Akka.Remote": "1.1.3",
     "Akka.Serialization.Hyperion": "1.1.3.32-beta",
-    "Slalom.Stacks": "1.4.11"
+    "Slalom.Stacks": "1.4.20"
   },
   "frameworks": {
     "net461": {

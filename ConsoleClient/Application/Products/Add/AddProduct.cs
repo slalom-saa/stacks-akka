@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ConsoleClient.Application.Products.Stock;
 using ConsoleClient.Domain.Products;
@@ -9,9 +10,17 @@ namespace ConsoleClient.Application.Products.Add
     [Path("products/add")]
     public class AddProduct : UseCase<AddProductCommand, AddProductEvent>
     {
+        private int _count = 0;
+
         public override async Task<AddProductEvent> ExecuteAsync(AddProductCommand command)
         {
             var target = new Product("name");
+
+            Console.WriteLine(_count++);
+            if (_count > 2)
+            {
+                throw new Exception("Asdf");
+            }
 
             await this.Domain.AddAsync(target);
 

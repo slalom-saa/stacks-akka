@@ -29,7 +29,30 @@ namespace Slalom.Stacks.Messaging.Routing
 
             await _handler.Handle((TMessage)request.Message);
 
+            if (request.Context.Exception != null)
+            {
+                throw request.Context.Exception;
+            }
+
             this.Sender.Tell(new MessageResult(request.Context));
         }
+
+        private int retries = 0;
+
+        protected override void PreRestart(Exception reason, object message)
+        {
+            retries++;
+            if (retries > 1)
+            {
+                Sender.Tell(new MessageResult(((AkkaRequest) message).Context));
+            }
+            else
+            {
+                var item = (AkkaRequest) message;
+                var context = new MessageExecutionContext(item.Context.Request, item.Context.Entry, item.Context.Execution, item.Context);
+                Self.Forward(new AkkaRequest(item.Message, context));
+            }
+        }
+
     }
 }

@@ -17,6 +17,8 @@ namespace ConsoleClient
 {
     public class ProductsCommandCoordinator : CommandCoordinator
     {
+        public string Content { get; set; }
+
         public ProductsCommandCoordinator(IComponentContext components)
             : base(components)
         {
