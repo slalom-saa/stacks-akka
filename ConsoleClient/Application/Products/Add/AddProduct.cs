@@ -16,8 +16,6 @@ namespace ConsoleClient.Application.Products.Add
         {
             var target = new Product("name");
 
-            throw new Exception("Asdf");
-
             Console.WriteLine(_count++);
             if (_count > 2)
             {

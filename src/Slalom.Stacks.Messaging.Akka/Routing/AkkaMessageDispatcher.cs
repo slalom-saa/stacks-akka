@@ -52,8 +52,6 @@ namespace Slalom.Stacks.Messaging.Routing
         private IRequestContext _requestContext;
         private IEnumerable<IRequestStore> _requests;
 
-        public AkkaActorNode RootNode { get; private set; }
-
         public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)
         {
             _system = system;

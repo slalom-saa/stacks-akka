@@ -35,7 +35,7 @@ namespace Slalom.Stacks.Messaging.Routing
                 }));
         }
 
-       
+
 
         protected readonly IComponentContext _components;
 
@@ -63,8 +63,10 @@ namespace Slalom.Stacks.Messaging.Routing
                     if (Context.Child(parent.Path).Equals(ActorRefs.Nobody))
                     {
                         var full = (this.Path + "/" + parent.Path.Split('/').Last()).Trim('/');
+
                         var target = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == full))
                                      ?? typeof(CommandCoordinator);
+
                         Context.ActorOf(Context.DI().Props(target), parent.Path.Split('/').Last());
                     }
                     Context.Child(parent.Path.Split('/').Last()).Forward(request);
@@ -73,14 +75,15 @@ namespace Slalom.Stacks.Messaging.Routing
                 {
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
+                        var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == this.Path + "/" + name))
+                                   ?? typeof(UseCaseActor<,>).MakeGenericType(entry.Type, request.Message.GetType());
                         try
                         {
-                            Context.ActorOf(Context.DI().Props(typeof(UseCaseActor<,>).MakeGenericType(entry.Type, request.Message.GetType()))
-                                .WithRouter(FromConfig.Instance), name);
+                            Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);
                         }
                         catch
                         {
-                            Context.ActorOf(Context.DI().Props(typeof(UseCaseActor<,>).MakeGenericType(entry.Type, request.Message.GetType())), name);
+                            Context.ActorOf(Context.DI().Props(type), name);
                         }
                     }
                     Context.Child(name).Forward(request);

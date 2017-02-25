@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Akka.Actor;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
 using ConsoleClient.Aspects;
+using ConsoleClient.Domain.Products;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
@@ -12,15 +15,31 @@ using Slalom.Stacks.Messaging.Routing;
 
 namespace ConsoleClient
 {
+    [Path("products/add")]
+    public class B : UseCaseActor<AddProduct, AddProductCommand>
+    {
+        public B(AddProduct handler)
+            : base(handler)
+        {
+        }
+
+        public override int Retries => 3;
+
+        protected override Task Execute(AkkaRequest request)
+        {
+            return base.Execute(request);
+        }
+    }
+
     [Path("products")]
     public class AC : CommandCoordinator
     {
         public AC(IComponentContext components) : base(components)
         {
         }
+
         protected override bool Execute(AkkaRequest request)
         {
-            //Console.WriteLine(request.Message.GetType());
             return base.Execute(request);
         }
     }
@@ -46,8 +65,8 @@ namespace ConsoleClient
                     stack.Use(builder =>
                     {
                         builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
-                        builder.RegisterType<RequestStore>().As<IRequestStore>();
-                        builder.RegisterType<ResponseStore>().As<IResponseStore>();
+                     //   builder.RegisterType<RequestStore>().As<IRequestStore>();
+                      //  builder.RegisterType<ResponseStore>().As<IResponseStore>();
                     });
 
                     var tasks = new List<Task>
@@ -86,7 +105,8 @@ namespace ConsoleClient
                     //    Console.WriteLine(item.Exception == null);   
                     //}
 
-                    //Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
+                    Console.WriteLine("...");
+                    Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
 
                     Console.WriteLine("...");
                     Console.ReadLine();
