@@ -46,17 +46,17 @@ namespace ConsoleClient
                     stack.Use(builder =>
                     {
                         builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
-                        //builder.RegisterType<RequestStore>().As<IRequestStore>();
-                        //builder.RegisterType<ResponseStore>().As<IResponseStore>();
+                        builder.RegisterType<RequestStore>().As<IRequestStore>();
+                        builder.RegisterType<ResponseStore>().As<IResponseStore>();
                     });
 
                     var tasks = new List<Task>
                     {
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand(null, 20)),
+                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
 
 
 
