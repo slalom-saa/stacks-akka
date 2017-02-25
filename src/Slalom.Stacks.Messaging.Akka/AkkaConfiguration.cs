@@ -21,7 +21,7 @@ namespace Slalom.Stacks.Messaging
                 builder.Register(c => system).AsSelf().SingleInstance();
 
                 builder.Register(c => new AkkaMessageDispatcher(system, c.Resolve<IComponentContext>()))
-                       .As<IMessageDispatcher>()
+                       .As<IMessageGatewayAdapter>()
                        .SingleInstance();
 
             });

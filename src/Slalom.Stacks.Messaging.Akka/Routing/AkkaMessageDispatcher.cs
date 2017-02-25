@@ -42,7 +42,7 @@ namespace Slalom.Stacks.Messaging.Routing
         }
     }
 
-    public class AkkaMessageDispatcher : IMessageDispatcher
+    public class AkkaMessageDispatcher : IMessageGatewayAdapter
     {
         private readonly ActorSystem _system;
         private readonly IComponentContext _components;
@@ -72,7 +72,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
         public async Task<MessageResult> Send(ICommand instance, MessageExecutionContext parentContext = null, TimeSpan? timeout = null)
         {
-            var request = _requestContext.Resolve(instance.CommandName, null, instance, parentContext?.Request);
+            var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
             _requests.ToList().ForEach(async e => await e.Append(new RequestEntry(request)));
 
             var entries = _registry.Find(instance).ToList();
@@ -107,7 +107,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
         public async Task<MessageResult> Send(string path, ICommand instance, MessageExecutionContext parentContext = null, TimeSpan? timeout = null)
         {
-            var request = _requestContext.Resolve(instance.CommandName, null, instance, parentContext?.Request);
+            var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
             _requests.ToList().ForEach(async e => await e.Append(new RequestEntry(request)));
 
             var entry = _registry.Find(path);
