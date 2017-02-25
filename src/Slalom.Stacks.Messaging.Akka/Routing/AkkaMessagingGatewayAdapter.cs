@@ -1,73 +1,75 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
-using Akka.Routing;
 using Autofac;
-using Newtonsoft.Json;
-using Slalom.Stacks.Domain;
+using System.Linq;
+using System.Threading.Tasks;
 using Slalom.Stacks.Messaging.Logging;
-using Slalom.Stacks.Reflection;
 using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class EventStreamListener : ReceiveActor
+    /// <summary>
+    /// An Akka.NET <see cref="IMessageGatewayAdapter"/> implementation.
+    /// </summary>
+    public class AkkaMessagingGatewayAdapter : IMessageGatewayAdapter
     {
         private readonly IComponentContext _components;
-        private LocalRegistry _registry;
-
-        public EventStreamListener(IComponentContext components)
-        {
-            _components = components;
-            _registry = components.Resolve<LocalRegistry>();
-
-            this.ReceiveAsync<AkkaRequest>(this.Execute);
-        }
-
-        private async Task Execute(AkkaRequest arg)
-        {
-            foreach (var entry in _registry.Find(arg.Message))
-            {
-                var handler = _components.Resolve(entry.Type);
-                if (handler is IUseMessageContext)
-                {
-                    ((IUseMessageContext)handler).UseContext(arg.Context);
-                }
-                await (Task)typeof(IHandle<>).MakeGenericType(arg.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { arg.Message });
-            }
-        }
-    }
-
-    public class AkkaMessageDispatcher : IMessageGatewayAdapter
-    {
         private readonly ActorSystem _system;
-        private readonly IComponentContext _components;
-        private IActorRef _actorRef;
-        private IExecutionContext _executionContextResolver;
-        private LocalRegistry _registry;
-        private IRequestContext _requestContext;
-        private IEnumerable<IRequestStore> _requests;
+        private readonly IActorRef _actorRef;
+        private readonly IExecutionContext _executionContext;
+        private readonly LocalRegistry _registry;
+        private readonly IRequestContext _requestContext;
+        private readonly IEnumerable<IRequestStore> _requests;
 
-        public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AkkaMessagingGatewayAdapter"/> class.
+        /// </summary>
+        /// <param name="system">The actor system.</param>
+        /// <param name="components">The configured components.</param>
+        public AkkaMessagingGatewayAdapter(ActorSystem system, IComponentContext components)
         {
             _system = system;
             _components = components;
             _registry = _components.Resolve<LocalRegistry>();
 
             _actorRef = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
-            _executionContextResolver = _components.Resolve<IExecutionContext>();
+            _executionContext = _components.Resolve<IExecutionContext>();
             _requests = components.ResolveAll<IRequestStore>();
-
             _requestContext = components.Resolve<IRequestContext>();
 
             var listener = system.ActorOf(system.DI().Props<EventStreamListener>());
             system.EventStream.Subscribe(listener, typeof(AkkaRequest));
         }
 
+        /// <inheritdoc />
+        public Task Publish(IEvent instance, MessageExecutionContext parentContext = null)
+        {
+            var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
+            _requests.ToList().ForEach(async e => await e.Append(new RequestEntry(request)));
+            var executionContext = _executionContext.Resolve();
+
+            var entries = _registry.Find(instance).ToList();
+            foreach (var entry in entries)
+            {
+                var context = new MessageExecutionContext(request, entry, executionContext, parentContext);
+
+                _system.EventStream.Publish(new AkkaRequest(instance, context));
+            }
+            return Task.FromResult(0);
+        }
+
+        /// <inheritdoc />
+        public async Task Publish(IEnumerable<IEvent> instance, MessageExecutionContext context = null)
+        {
+            foreach (var @event in instance)
+            {
+                await this.Publish(@event, context);
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<MessageResult> Send(ICommand instance, MessageExecutionContext parentContext = null, TimeSpan? timeout = null)
         {
             var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
@@ -78,31 +80,18 @@ namespace Slalom.Stacks.Messaging.Routing
             {
                 throw new Exception("TBD");
             }
+            var entry = entries.First();
 
-            var executionContext = _components.Resolve<IExecutionContext>().Resolve();
+            var executionContext = _executionContext.Resolve();
 
-            var context = new MessageExecutionContext(request, entries.First(), executionContext, parentContext);
+            var context = new MessageExecutionContext(request, entry, executionContext, parentContext);
 
             await _actorRef.Ask(new AkkaRequest(instance, context), timeout);
 
             return new MessageResult(context);
         }
 
-        public async Task Publish(IEvent instance, MessageExecutionContext context = null)
-        {
-            //context = new MessageExecutionContext(instance.Id, instance.EventName, null, _executionContextResolver.Resolve(), context);
-
-            //_system.EventStream.Publish(new AkkaRequest(instance, context));
-        }
-
-        public async Task Publish(IEnumerable<IEvent> instance, MessageExecutionContext context = null)
-        {
-            foreach (var @event in instance)
-            {
-                await this.Publish(@event, context);
-            }
-        }
-
+        /// <inheritdoc />
         public async Task<MessageResult> Send(string path, ICommand instance, MessageExecutionContext parentContext = null, TimeSpan? timeout = null)
         {
             var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
@@ -123,6 +112,7 @@ namespace Slalom.Stacks.Messaging.Routing
             return new MessageResult(context);
         }
 
+        /// <inheritdoc />
         public Task<MessageResult> Send(string path, string command, MessageExecutionContext context = null, TimeSpan? timeout = null)
         {
             throw new NotImplementedException();

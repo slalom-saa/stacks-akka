@@ -12,6 +12,7 @@ using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Routing;
+#pragma warning disable 4014
 
 namespace ConsoleClient
 {

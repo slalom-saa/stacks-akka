@@ -1,53 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
-using Akka.Routing;
 using Autofac;
+using System.Linq;
+using Akka.Routing;
 using Slalom.Stacks.Reflection;
-using Slalom.Stacks.Runtime;
-using Slalom.Stacks.Text;
+using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
+    /// <summary>
+    /// A default Akka.NET supervisor.
+    /// </summary>
+    /// <seealso cref="Akka.Actor.ReceiveActor" />
     public class CommandCoordinator : ReceiveActor
     {
-        protected override void Unhandled(object message)
-        {
-            base.Unhandled(message);
-        }
+        private readonly IComponentContext _components;
 
-        protected override SupervisorStrategy SupervisorStrategy()
-        {
-            return new OneForOneStrategy( //or AllForOneStrategy
-                10,
-                TimeSpan.FromSeconds(30),
-                decider: Decider.From(x =>
-                {
-                    //Maybe we consider ArithmeticException to not be application critical
-                    //so we just ignore the error and keep going.
-                    if (x is ArithmeticException) return Directive.Resume;
-
-                    //In all other cases, just restart the failing actor
-                    else return Directive.Restart;
-                }));
-        }
-
-
-
-        protected readonly IComponentContext _components;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandCoordinator"/> class.
+        /// </summary>
+        /// <param name="components">The configured <see cref="IComponentContext"/>.</param>
         public CommandCoordinator(IComponentContext components)
         {
+            Argument.NotNull(components, nameof(components));
+
             _components = components;
 
             this.Receive<AkkaRequest>(e => this.Execute(e));
         }
 
-        public string Path => this.Self.Path.ToString().Substring(this.Self.Path.ToString().IndexOf("user/commands", StringComparison.Ordinal) + 13).Trim('/');
+        /// <summary>
+        /// Gets the current path.
+        /// </summary>
+        /// <value>The current path.</value>
+        protected string Path => this.Self.Path.ToString().Substring(this.Self.Path.ToString().IndexOf("user/commands", StringComparison.Ordinal) + 13).Trim('/');
 
+        /// <summary>
+        /// Executes the specified request.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns><c>true</c> if the request was successful, <c>false</c> otherwise.</returns>
         protected virtual bool Execute(AkkaRequest request)
         {
             var registry = _components.Resolve<LocalRegistry>();
@@ -91,6 +84,23 @@ namespace Slalom.Stacks.Messaging.Routing
             }
 
             return true;
+        }
+
+        /// <inheritdoc />
+        protected override SupervisorStrategy SupervisorStrategy()
+        {
+            return new OneForOneStrategy( //or AllForOneStrategy
+                10,
+                TimeSpan.FromSeconds(30),
+                decider: Decider.From(x =>
+                {
+                    //Maybe we consider ArithmeticException to not be application critical
+                    //so we just ignore the error and keep going.
+                    if (x is ArithmeticException) return Directive.Resume;
+
+                    //In all other cases, just restart the failing actor
+                    return Directive.Restart;
+                }));
         }
     }
 }
