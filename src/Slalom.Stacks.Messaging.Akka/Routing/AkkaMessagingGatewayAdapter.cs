@@ -5,6 +5,7 @@ using Akka.DI.Core;
 using Autofac;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Runtime;
 
@@ -113,9 +114,31 @@ namespace Slalom.Stacks.Messaging.Routing
         }
 
         /// <inheritdoc />
-        public Task<MessageResult> Send(string path, string command, MessageExecutionContext context = null, TimeSpan? timeout = null)
+        public async Task<MessageResult> Send(string path, string command, MessageExecutionContext parentContext = null, TimeSpan? timeout = null)
         {
-            throw new NotImplementedException();
+            var entry = _registry.Find(path);
+            if (entry == null)
+            {
+                throw new Exception("TBD");
+            }
+
+            if (String.IsNullOrWhiteSpace(command))
+            {
+                command = "{}";
+            }
+
+            var instance = (ICommand)JsonConvert.DeserializeObject(command, entry.RequestType);
+
+            var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
+            _requests.ToList().ForEach(async e => await e.Append(new RequestEntry(request)));
+
+            var executionContext = _components.Resolve<IExecutionContext>().Resolve();
+
+            var context = new MessageExecutionContext(request, entry, executionContext, parentContext);
+
+            await _actorRef.Ask(new AkkaRequest(instance, context), timeout);
+
+            return new MessageResult(context);
         }
     }
 }

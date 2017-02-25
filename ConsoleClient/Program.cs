@@ -67,7 +67,7 @@ namespace ConsoleClient
                     //stack.UseSimpleConsoleLogging();
                     stack.UseAkkaMessaging(e =>
                     {
-                        e.WithLoggingClient("akka.tcp://logging@localhost:8080/user/log");
+                        //e.WithLoggingClient("akka.tcp://logging@localhost:8080/user/log");
                     });
 
                     stack.UseAkkaLoggingService();
@@ -81,11 +81,11 @@ namespace ConsoleClient
 
                     var tasks = new List<Task>
                     {
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", (string)null),
+                        //stack.Send("products/add", new AddProductCommand("", 20)),
+                        //stack.Send("products/add", new AddProductCommand("", 20)),
+                        //stack.Send("products/add", new AddProductCommand("", 20)),
+                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         //stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         //stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         //stack.Send("products/add", new AddProductCommand("asdf", 20)),
