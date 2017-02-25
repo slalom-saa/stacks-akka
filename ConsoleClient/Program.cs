@@ -12,18 +12,18 @@ using Slalom.Stacks.Messaging.Routing;
 
 namespace ConsoleClient
 {
-    //[Path("products")]
-    //public class AC : CommandCoordinator
-    //{
-    //    public AC(IComponentContext components) : base(components)
-    //    {
-    //    }
-    //    protected override bool Execute(AkkaRequest request)
-    //    {
-    //        Console.WriteLine(request.Message.GetType());
-    //        return base.Execute(request);
-    //    }
-    //}
+    [Path("products")]
+    public class AC : CommandCoordinator
+    {
+        public AC(IComponentContext components) : base(components)
+        {
+        }
+        protected override bool Execute(AkkaRequest request)
+        {
+            //Console.WriteLine(request.Message.GetType());
+            return base.Execute(request);
+        }
+    }
 
     public class Program
     {
@@ -46,9 +46,8 @@ namespace ConsoleClient
                     stack.Use(builder =>
                     {
                         builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
-                        builder.RegisterGeneric(typeof(AkkaActorHost<,>));
-                        builder.Register(c => new LocalRegistry(stack.Assemblies)).AsSelf();
                         //builder.RegisterType<RequestStore>().As<IRequestStore>();
+                        //builder.RegisterType<ResponseStore>().As<IResponseStore>();
                     });
 
                     var tasks = new List<Task>
@@ -56,8 +55,11 @@ namespace ConsoleClient
                         stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20))
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
+
+
+
                         //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
                         //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
 

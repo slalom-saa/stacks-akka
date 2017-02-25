@@ -24,13 +24,13 @@ namespace ConsoleClient.Application.Products.Add
 
             await this.Domain.AddAsync(target);
 
-            //var stock = await this.Send(new StockProductCommand(command.Count));
-            //if (!stock.IsSuccessful)
-            //{
-            //    await this.Domain.RemoveAsync(target);
+            var stock = await this.Send(new StockProductCommand(command.Count));
+            if (!stock.IsSuccessful)
+            {
+                await this.Domain.RemoveAsync(target);
 
-            //    throw new ChainFailedException(command, stock);
-            //}
+                throw new ChainFailedException(command, stock);
+            }
 
             return new AddProductEvent();
         }

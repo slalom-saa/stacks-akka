@@ -6,9 +6,9 @@ namespace Slalom.Stacks.Messaging.Routing
     {
         public IMessage Message { get; }
 
-        public MessageContext Context { get; }
+        public MessageExecutionContext Context { get; }
 
-        public AkkaRequest(IMessage message, MessageContext context)
+        public AkkaRequest(IMessage message, MessageExecutionContext context)
         {
             this.Message = message;
             this.Context = context;
