@@ -16,10 +16,10 @@ namespace ConsoleClient.Application.Products.Add
         {
             var target = new Product("name");
 
-            Console.WriteLine(_count++);
+            Console.WriteLine("Sending with item number of " + ++_count);
             if (_count > 2)
             {
-                throw new Exception("Asdf");
+                throw new Exception("The current coutn is greater than 2.");
             }
 
             await this.Domain.AddAsync(target);

@@ -413,7 +413,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "Slalom.Stacks/1.4.23": {
+      "Slalom.Stacks/1.4.24": {
         "type": "package",
         "dependencies": {
           "Autofac": "4.3.0",
@@ -1696,12 +1696,12 @@
         "tools/install.ps1"
       ]
     },
-    "Slalom.Stacks/1.4.23": {
-      "sha512": "O5WckFq3nYX/W9DjtdrqqV8OhSL1CPbyYze/2cQEvnSLhRa+T/fW/ga9ei9Tl20JT/+N40aiWGTMuPTCAXiGaQ==",
+    "Slalom.Stacks/1.4.24": {
+      "sha512": "G01Lhm6yJBNoz9uIlmXAWdhEPPHsJG2BJtKkI+6dWaMzllULIRJoiDP5vSoE7YkjR75Nni/kMeI6QKKJ5Vp1Qg==",
       "type": "package",
-      "path": "Slalom.Stacks/1.4.23",
+      "path": "Slalom.Stacks/1.4.24",
       "files": [
-        "Slalom.Stacks.1.4.23.nupkg.sha512",
+        "Slalom.Stacks.1.4.24.nupkg.sha512",
         "Slalom.Stacks.nuspec",
         "Tools/init.ps1",
         "lib/Newtonsoft.Json.dll",
@@ -4681,7 +4681,7 @@
       "Akka.DI.Core >= 1.1.3",
       "Akka.Remote >= 1.1.3",
       "Akka.Serialization.Hyperion >= 1.1.3.32-beta",
-      "Slalom.Stacks >= 1.4.23"
+      "Slalom.Stacks >= 1.4.24"
     ],
     ".NETFramework,Version=v4.6.1": []
   },

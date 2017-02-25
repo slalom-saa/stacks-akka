@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.Configuration;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
 using ConsoleClient.Aspects;
@@ -50,7 +52,9 @@ namespace ConsoleClient
         public static void Main(string[] args)
         {
             Console.WriteLine("Press any key to halt...");
-            Start();
+            //Task.Run(() => StartLogger());
+            //Thread.Sleep(800);
+            Task.Run(() => Start());
             Console.ReadLine();
         }
 
@@ -61,13 +65,18 @@ namespace ConsoleClient
                 using (var stack = new Stack(typeof(Program)))
                 {
                     //stack.UseSimpleConsoleLogging();
-                    stack.UseAkka("local");
+                    stack.UseAkkaMessaging(e =>
+                    {
+                        e.WithLoggingClient("akka.tcp://logging@localhost:8080/user/log");
+                    });
+
+                    stack.UseAkkaLoggingService();
 
                     stack.Use(builder =>
                     {
-                        builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
-                     //   builder.RegisterType<RequestStore>().As<IRequestStore>();
-                      //  builder.RegisterType<ResponseStore>().As<IResponseStore>();
+                        // builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
+                        //   builder.RegisterType<RequestStore>().As<IRequestStore>();
+                        //  builder.RegisterType<ResponseStore>().As<IResponseStore>();
                     });
 
                     var tasks = new List<Task>
@@ -76,7 +85,7 @@ namespace ConsoleClient
                         stack.Send("products/add", new AddProductCommand("", 20)),
                         stack.Send("products/add", new AddProductCommand("", 20)),
                         stack.Send("products/add", new AddProductCommand("", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         //stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         //stack.Send("products/add", new AddProductCommand("asdf", 20)),
                         //stack.Send("products/add", new AddProductCommand("asdf", 20)),
@@ -101,16 +110,11 @@ namespace ConsoleClient
                     };
 
                     await Task.WhenAll(tasks);
-                    //foreach (var item in tasks)
-                    //{
-                    //    Console.WriteLine(item.Exception == null);   
-                    //}
 
                     Console.WriteLine("...");
                     Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
 
-                    Console.WriteLine("...");
-                    Console.ReadLine();
+                    await stack.GetExit();
                 }
             }
             catch (Exception exception)
