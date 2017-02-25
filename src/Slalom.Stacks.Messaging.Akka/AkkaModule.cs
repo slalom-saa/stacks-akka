@@ -1,37 +1,50 @@
 using System;
+using Autofac;
 using System.Linq;
 using System.Reflection;
 using Akka.Actor;
-using Autofac;
-using Slalom.Stacks.Configuration;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Reflection;
+using Slalom.Stacks.Validation;
 using Module = Autofac.Module;
 
 namespace Slalom.Stacks.Messaging
 {
+    /// <summary>
+    /// Autofac module that configures the Akka.NET messaging block.
+    /// </summary>
+    /// <seealso cref="Autofac.Module" />
     public class AkkaModule : Module
     {
         private readonly Assembly[] _assemblies;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AkkaModule"/> class.
+        /// </summary>
+        /// <param name="assemblies">The assemblies.</param>
         public AkkaModule(Assembly[] assemblies)
         {
-            _assemblies = assemblies.Union(new[] {typeof(AkkaModule).Assembly}).ToArray();
+            Argument.NotNull(assemblies, nameof(assemblies));
+
+            _assemblies = assemblies.Union(new[] { typeof(AkkaModule).Assembly }).ToArray();
         }
 
+        /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
 
             builder.Register(c => new DefaultSupervisorStrategy())
-                .AsSelf()
-                .InstancePerDependency();
+                   .AsSelf()
+                   .InstancePerDependency();
 
             builder.RegisterAssemblyTypes(_assemblies)
-                .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
-                .AsSelf()
-                .PropertiesAutowired();
+                   .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
+                   .AsSelf()
+                   .InstancePerDependency()
+                   .PropertiesAutowired();
 
+            builder.RegisterGeneric(typeof(UseCaseActor<,>));
         }
     }
 }

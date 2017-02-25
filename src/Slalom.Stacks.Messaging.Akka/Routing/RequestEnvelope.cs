@@ -9,11 +9,11 @@
 //    {
 //        public Request Message { get;  }
 
-//        public MessageContext Context { get; }
+//        public MessageExecutionContext Context { get; }
 
 //        public AkkaActorNode Node { get; }
 
-//        public MessageEnvelope(Request message, MessageContext context, AkkaActorNode node)
+//        public MessageEnvelope(Request message, MessageExecutionContext context, AkkaActorNode node)
 //        {
 //            this.Message = message;
 //            this.Context = context;
