@@ -9,6 +9,7 @@ namespace ConsoleClient.Aspects
     {
         public Task Append(RequestEntry entry)
         {
+            Console.WriteLine("Request:");
             Console.WriteLine(JsonConvert.SerializeObject(entry, Formatting.Indented));
 
             return Task.FromResult(0);

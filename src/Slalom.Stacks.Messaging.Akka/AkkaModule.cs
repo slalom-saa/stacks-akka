@@ -33,7 +33,7 @@ namespace Slalom.Stacks.Messaging
                 .InstancePerDependency()
                 .PropertiesAutowired();
 
-            builder.RegisterGeneric(typeof(AkkaActorHost<,>));
+            builder.RegisterGeneric(typeof(UseCaseActor<,>));
 
         }
     }

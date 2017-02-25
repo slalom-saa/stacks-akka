@@ -1,26 +1,26 @@
 using System;
-using System.Collections.Generic;
 using Akka.Actor;
 using System.Linq;
 using System.Threading.Tasks;
-using Autofac;
-using Slalom.Stacks.Messaging.Pipeline;
-using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
-    public class AkkaActorHost<THandler, TMessage> : ReceiveActor where THandler : IHandle<TMessage>
+    public class UseCaseActor<THandler, TMessage> : ReceiveActor where THandler : IHandle<TMessage>
     {
         private readonly THandler _handler;
 
-        public AkkaActorHost(THandler handler)
+        public virtual int Retries { get; set; } = 0;
+
+        private int _currentRetries;
+
+        public UseCaseActor(THandler handler)
         {
             _handler = handler;
 
             this.ReceiveAsync<AkkaRequest>(this.Execute);
         }
 
-        private async Task Execute(AkkaRequest request)
+        protected virtual async Task Execute(AkkaRequest request)
         {
             if (_handler is IUseMessageContext)
             {
@@ -37,22 +37,20 @@ namespace Slalom.Stacks.Messaging.Routing
             this.Sender.Tell(new MessageResult(request.Context));
         }
 
-        private int retries = 0;
-
         protected override void PreRestart(Exception reason, object message)
         {
-            retries++;
-            if (retries > 1)
+            _currentRetries++;
+
+            if (_currentRetries >= this.Retries)
             {
-                Sender.Tell(new MessageResult(((AkkaRequest) message).Context));
+                this.Sender.Tell(new MessageResult(((AkkaRequest)message).Context));
             }
             else
             {
-                var item = (AkkaRequest) message;
+                var item = (AkkaRequest)message;
                 var context = new MessageExecutionContext(item.Context.RequestContext, item.Context.RegistryEntry, item.Context.ExecutionContext, item.Context);
-                Self.Forward(new AkkaRequest(item.Message, context));
+                this.Self.Forward(new AkkaRequest(item.Message, context));
             }
         }
-
     }
 }

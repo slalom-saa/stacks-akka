@@ -75,12 +75,12 @@ namespace Slalom.Stacks.Messaging.Routing
                     {
                         try
                         {
-                            Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost<,>).MakeGenericType(entry.Type, request.Message.GetType()))
+                            Context.ActorOf(Context.DI().Props(typeof(UseCaseActor<,>).MakeGenericType(entry.Type, request.Message.GetType()))
                                 .WithRouter(FromConfig.Instance), name);
                         }
                         catch
                         {
-                            Context.ActorOf(Context.DI().Props(typeof(AkkaActorHost<,>).MakeGenericType(entry.Type, request.Message.GetType())), name);
+                            Context.ActorOf(Context.DI().Props(typeof(UseCaseActor<,>).MakeGenericType(entry.Type, request.Message.GetType())), name);
                         }
                     }
                     Context.Child(name).Forward(request);
