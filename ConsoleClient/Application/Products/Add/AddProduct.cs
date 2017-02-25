@@ -19,7 +19,7 @@ namespace ConsoleClient.Application.Products.Add
             Console.WriteLine("Sending with item number of " + ++_count);
             if (_count > 2)
             {
-                throw new Exception("The current coutn is greater than 2.");
+                throw new Exception("The current count is greater than 2.");
             }
 
             await this.Domain.AddAsync(target);
