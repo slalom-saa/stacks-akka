@@ -34,10 +34,6 @@ namespace Slalom.Stacks.Messaging
         {
             base.Load(builder);
 
-            builder.Register(c => new DefaultSupervisorStrategy())
-                   .AsSelf()
-                   .InstancePerDependency();
-
             builder.RegisterAssemblyTypes(_assemblies)
                    .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
                    .AsSelf()
