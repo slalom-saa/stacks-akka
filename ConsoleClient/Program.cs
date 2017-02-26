@@ -9,6 +9,7 @@ using Autofac;
 using ConsoleClient.Application.Products.Add;
 using ConsoleClient.Aspects;
 using ConsoleClient.Domain.Products;
+using Newtonsoft.Json;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
@@ -62,56 +63,37 @@ namespace ConsoleClient
         {
             try
             {
-                using (var stack = new Stack(typeof(Program)))
+                using (var stack = new Stack())
                 {
-                    //stack.UseSimpleConsoleLogging();
-
-                    stack.UseAkkaMessaging();
-                    //stack.UseAkkaLogging();
-
-                    //stack.UseAkkaLoggingService();
-
-                    stack.Use(builder =>
+                    stack.UseAkkaMessaging(e =>
                     {
-                        // builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
-                        //   builder.RegisterType<RequestStore>().As<IRequestStore>();
-                        //  builder.RegisterType<ResponseStore>().As<IResponseStore>();
+                        e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
 
-                    var tasks = new List<Task>
-                    {
-                        stack.Send("products/add", (string)null),
-                        //stack.Send("products/add", new AddProductCommand("", 20)),
-                        //stack.Send("products/add", new AddProductCommand("", 20)),
-                        //stack.Send("products/add", new AddProductCommand("", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                    //var tasks = new List<Task>();
+                    //for (int i = 0; i < 10; i++)
+                    //{
+                        stack.Send("remote").Wait();
+                    //}
+
+                    //Task.WaitAll(tasks.ToArray());
 
 
 
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                    //stack.Container.Resolve<ActorSystem>().ActorSelection("user/admin/remote")
 
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20))
+                    //var remote = stack.GetRegistry();
 
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15))
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}")
-                    };
+                    //Console.WriteLine(JsonConvert.SerializeObject(remote, Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
-                    await Task.WhenAll(tasks);
+                    //Console.ReadKey();
+
+                    //var reg = stack.GetRegistry("akka.tcp://local@localhost:8081");
+
+                    //Console.WriteLine(JsonConvert.SerializeObject(reg, Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+
 
                     Console.WriteLine("...");
-                    Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
 
                     await stack.GetExit();
                 }

@@ -3,6 +3,7 @@ using Autofac;
 using System.Linq;
 using System.Reflection;
 using Akka.Actor;
+using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Reflection;
 using Slalom.Stacks.Validation;
@@ -33,6 +34,10 @@ namespace Slalom.Stacks.Messaging
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
+
+            builder.RegisterType<AdminCoordinator>().AsSelf();
+            builder.RegisterType<RegistryService>().AsSelf();
+            builder.RegisterType<RemoteCallActor>().AsSelf();
 
             builder.RegisterAssemblyTypes(_assemblies)
                    .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))

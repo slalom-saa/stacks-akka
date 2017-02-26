@@ -6,6 +6,7 @@ using Autofac;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Runtime;
 
@@ -119,6 +120,14 @@ namespace Slalom.Stacks.Messaging.Routing
             var entry = _registry.Find(path);
             if (entry == null)
             {
+                var remote = _components.Resolve<RemoteRegistryCollection>().Find(path);;
+                if (remote != null)
+                {
+                    var result = await _system.ActorSelection(remote.Root + "user/admin/inbound").Ask(new RemoteCall(remote.Path, command));
+
+                    return result as MessageResult;
+                }
+
                 throw new Exception("TBD");
             }
 

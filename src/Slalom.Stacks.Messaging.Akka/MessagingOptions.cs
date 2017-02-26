@@ -5,6 +5,8 @@ namespace Slalom.Stacks.Messaging
     /// </summary>
     public class MessagingOptions
     {
+        internal string[] Remotes { get; set; } = new string[0];
+
         internal string SystemName { get; set; } = "local";
 
         internal bool UseLoggingClient { get; set; }
@@ -17,6 +19,17 @@ namespace Slalom.Stacks.Messaging
         public MessagingOptions WithName(string name)
         {
             this.SystemName = name;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the stack to use the Akka.NET actor system to connect to the specified remote systems.
+        /// </summary>
+        /// <returns>This instance for method chaining.</returns>
+        public MessagingOptions WithRemotes(params string[] remotes)
+        {
+            this.Remotes = remotes;
+
             return this;
         }
     }
