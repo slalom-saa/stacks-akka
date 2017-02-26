@@ -52,6 +52,8 @@ namespace Slalom.Stacks.Messaging
 
             system.ActorOf(system.DI().Props<LogService>(), "log");
 
+            instance.GetExit().Wait();
+
             return instance;
         }
 
