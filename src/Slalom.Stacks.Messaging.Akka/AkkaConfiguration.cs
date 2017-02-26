@@ -33,7 +33,7 @@ namespace Slalom.Stacks.Messaging
         /// <param name="instance">The this instance.</param>
         /// <param name="configuration">The configuration routine.</param>
         /// <returns>Stack.</returns>
-        public static Stack UseAkkaLoggingService(this Stack instance, Action<LoggingServiceOptions> configuration = null)
+        public static Stack RunAkkaLoggingService(this Stack instance, Action<LoggingServiceOptions> configuration = null)
         {
             var options = new LoggingServiceOptions();
             configuration?.Invoke(options);
