@@ -63,6 +63,34 @@ namespace Slalom.Stacks.Messaging
         /// <param name="instance">The this instance.</param>
         /// <param name="configuration">The configuration routine.</param>
         /// <returns>Stack.</returns>
+        public static Stack UseAkkaLogging(this Stack instance, Action<LoggingOptions> configuration = null)
+        {
+            var options = new LoggingOptions();
+            configuration?.Invoke(options);
+
+            var system = ActorSystem.Create(options.SystemName);
+            new AutoFacDependencyResolver(instance.Container, system);
+
+            instance.Use(builder =>
+            {
+                builder.Register(c => new LogClient(system, options))
+                       .PreserveExistingDefaults()
+                       .SingleInstance()
+                       .As<ILogger>()
+                       .As<IRequestStore>()
+                       .As<IResponseStore>()
+                       .PreserveExistingDefaults();
+            });
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Configures the stack to use Akka.NET Messaging.
+        /// </summary>
+        /// <param name="instance">The this instance.</param>
+        /// <param name="configuration">The configuration routine.</param>
+        /// <returns>Stack.</returns>
         public static Stack UseAkkaMessaging(this Stack instance, Action<MessagingOptions> configuration = null)
         {
             var options = new MessagingOptions();
@@ -80,17 +108,6 @@ namespace Slalom.Stacks.Messaging
                 builder.Register(c => new AkkaMessagingGatewayAdapter(system, c.Resolve<IComponentContext>()))
                        .As<IMessageGatewayAdapter>()
                        .SingleInstance();
-
-                if (options.UseLoggingClient)
-                {
-                    builder.Register(c => new LogClient(system, options))
-                           .PreserveExistingDefaults()
-                           .SingleInstance()
-                           .As<ILogger>()
-                           .As<IRequestStore>()
-                           .As<IResponseStore>()
-                           .PreserveExistingDefaults();
-                }
             });
 
             return instance;

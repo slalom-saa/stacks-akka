@@ -65,10 +65,9 @@ namespace ConsoleClient
                 using (var stack = new Stack(typeof(Program)))
                 {
                     //stack.UseSimpleConsoleLogging();
-                    stack.UseAkkaMessaging(e =>
-                    {
-                        e.WithLoggingClient("akka.tcp://logging@localhost:8080/user/log");
-                    });
+
+                    stack.UseAkkaMessaging();
+                    //stack.UseAkkaLogging();
 
                     //stack.UseAkkaLoggingService();
 

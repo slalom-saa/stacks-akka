@@ -13,7 +13,7 @@ namespace Slalom.Stacks.Messaging.Logging
     /// <seealso cref="Slalom.Stacks.Logging.ILogger" />
     public class LogClient : ILogger, IRequestStore, IResponseStore
     {
-        private readonly MessagingOptions _options;
+        private readonly LoggingOptions _options;
         private readonly ActorSystem _system;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Slalom.Stacks.Messaging.Logging
         /// </summary>
         /// <param name="system">The configured actor system.</param>
         /// <param name="options">The configured options.</param>
-        public LogClient(ActorSystem system, MessagingOptions options)
+        public LogClient(ActorSystem system, LoggingOptions options)
         {
             Argument.NotNull(system, nameof(system));
             Argument.NotNull(options, nameof(options));
