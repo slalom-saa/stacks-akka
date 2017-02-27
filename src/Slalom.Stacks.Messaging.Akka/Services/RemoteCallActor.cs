@@ -1,25 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Newtonsoft.Json;
 
-namespace Slalom.Stacks.Messaging.Actors
+namespace Slalom.Stacks.Messaging.Services
 {
-    public class RemoteCall
-    {
-        public string Path { get; set; }
-
-        public string Content { get; set; }
-
-        public RemoteCall(string path, string content)
-        {
-            this.Path = path;
-            this.Content = content;
-        }
-    }
-
     public class RemoteCallActor : ReceiveActor
     {
         public RemoteCallActor(IMessageGatewayAdapter messages)

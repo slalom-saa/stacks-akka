@@ -3,8 +3,8 @@ using Autofac;
 using System.Linq;
 using System.Reflection;
 using Akka.Actor;
-using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Reflection;
 using Slalom.Stacks.Validation;
 using Module = Autofac.Module;
@@ -38,6 +38,7 @@ namespace Slalom.Stacks.Messaging
             builder.RegisterType<ServicesCoordinator>().AsSelf();
             builder.RegisterType<ServiceRegistryActor>().AsSelf();
             builder.RegisterType<RemoteCallActor>().AsSelf();
+            builder.RegisterType<LogService>().AsSelf();
 
             builder.RegisterAssemblyTypes(_assemblies)
                    .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))

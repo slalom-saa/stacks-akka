@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Autofac;
 using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Autofac;
 using Slalom.Stacks.Logging;
+using Slalom.Stacks.Messaging.Logging;
 
-namespace Slalom.Stacks.Messaging.Logging
+namespace Slalom.Stacks.Messaging.Services
 {
     /// <summary>
     /// Default logging actor that takes traces, requests and responses.

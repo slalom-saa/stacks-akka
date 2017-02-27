@@ -7,10 +7,10 @@ using Akka.DI.AutoFac;
 using Akka.DI.Core;
 using Autofac;
 using Slalom.Stacks.Logging;
-using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Messaging.Services;
 
 // ReSharper disable ObjectCreationAsStatement
 
@@ -52,35 +52,7 @@ namespace Slalom.Stacks.Messaging
 
             instance.GetExit().Wait();
         }
-
-        /// <summary>
-        /// Configures the stack use the Akka.NET logging service.
-        /// </summary>
-        /// <param name="instance">The this instance.</param>
-        /// <param name="configuration">The configuration routine.</param>
-        /// <returns>Stack.</returns>
-        public static void RunAkkaLoggingService(this Stack instance, Action<LoggingServiceOptions> configuration = null)
-        {
-            var options = new LoggingServiceOptions();
-            configuration?.Invoke(options);
-
-            var system = ActorSystem.Create(options.SystemName);
-            new AutoFacDependencyResolver(instance.Container, system);
-
-            instance.Use(builder =>
-            {
-                builder.RegisterModule(new AkkaModule(instance.Assemblies));
-
-                builder.Register(c => system).AsSelf().SingleInstance();
-
-                builder.RegisterType<LogService>();
-            });
-
-            system.ActorOf(system.DI().Props<LogService>(), "log");
-
-            instance.GetExit().Wait();
-        }
-
+      
         /// <summary>
         /// Configures the stack to use Akka.NET Messaging.
         /// </summary>
@@ -123,8 +95,6 @@ namespace Slalom.Stacks.Messaging
             var system = ActorSystem.Create(options.SystemName);
             new AutoFacDependencyResolver(instance.Container, system);
 
-            system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
-
             instance.Use(builder =>
             {
                 builder.RegisterModule(new AkkaModule(instance.Assemblies));
@@ -136,6 +106,8 @@ namespace Slalom.Stacks.Messaging
                        .SingleInstance();
             });
 
+            system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
+
 
             var registry = instance.Container.Resolve<ServiceRegistry>();
             foreach (var remote in options.Remotes)
@@ -144,9 +116,8 @@ namespace Slalom.Stacks.Messaging
                 foreach (var service in services)
                 {
                     service.Path = remote;
-                    service.Entries.ForEach(e => e.RootPath = remote);
+                    registry.Services.Add(service);
                 }
-                registry.Services.AddRange(services);
             }
 
             return instance;

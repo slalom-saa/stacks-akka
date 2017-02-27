@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Akka.Actor;
-using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Registration;
 
-namespace Slalom.Stacks.Messaging.Actors
+namespace Slalom.Stacks.Messaging.Services
 {
     public class ServiceRegistryActor : ReceiveActor
     {

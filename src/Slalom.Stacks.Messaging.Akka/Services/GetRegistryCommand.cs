@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace Slalom.Stacks.Messaging.Actors
+namespace Slalom.Stacks.Messaging.Services
 {
     public class GetRegistryCommand : Command
     {

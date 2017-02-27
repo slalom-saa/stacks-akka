@@ -6,7 +6,7 @@ using Akka.Actor;
 using Akka.DI.Core;
 using Akka.Routing;
 
-namespace Slalom.Stacks.Messaging.Actors
+namespace Slalom.Stacks.Messaging.Services
 {
     public class ServicesCoordinator : ReceiveActor
     {
@@ -16,6 +16,7 @@ namespace Slalom.Stacks.Messaging.Actors
 
             Context.ActorOf(Context.DI().Props<ServiceRegistryActor>(), "registry");
             Context.ActorOf(Context.DI().Props<RemoteCallActor>().WithRouter(new RoundRobinPool(15)), "remote");
+            Context.ActorOf(Context.DI().Props<LogService>().WithRouter(new RoundRobinPool(15)), "logs");
         }
     }
 }
