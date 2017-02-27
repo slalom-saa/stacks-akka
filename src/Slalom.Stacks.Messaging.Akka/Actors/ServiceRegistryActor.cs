@@ -4,20 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Slalom.Stacks.Messaging.Actors;
+using Slalom.Stacks.Messaging.Registration;
 
-namespace Slalom.Stacks.Messaging
+namespace Slalom.Stacks.Messaging.Actors
 {
-    public class RegistryService : ReceiveActor
+    public class ServiceRegistryActor : ReceiveActor
     {
-        private readonly LocalRegistry _registry;
+        private readonly ServiceRegistry _registry;
 
-        public RegistryService(LocalRegistry registry)
+        public ServiceRegistryActor(ServiceRegistry registry)
         {
             _registry = registry;
 
             this.Receive<GetRegistryCommand>(m =>
             {
-                this.Sender.Tell(new RemoteRegistry(m.RemotePath, _registry));
+                this.Sender.Tell(_registry);
             });
         }
     }

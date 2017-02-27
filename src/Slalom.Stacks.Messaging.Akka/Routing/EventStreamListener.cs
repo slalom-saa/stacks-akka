@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Autofac;
+using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing
@@ -12,7 +14,7 @@ namespace Slalom.Stacks.Messaging.Routing
     public class EventStreamListener : ReceiveActor
     {
         private readonly IComponentContext _components;
-        private LocalRegistry _registry;
+        private ServiceRegistry _registry;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStreamListener"/> class.
@@ -23,7 +25,7 @@ namespace Slalom.Stacks.Messaging.Routing
             Argument.NotNull(components, nameof(components));
 
             _components = components;
-            _registry = components.Resolve<LocalRegistry>();
+            _registry = components.Resolve<ServiceRegistry>();
 
             this.ReceiveAsync<AkkaRequest>(this.Execute);
         }
@@ -32,7 +34,7 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             foreach (var entry in _registry.Find(arg.Message))
             {
-                var handler = _components.Resolve(entry.Type);
+                var handler = _components.Resolve(Type.GetType(entry.Type));
                 if (handler is IUseMessageContext)
                 {
                     ((IUseMessageContext)handler).UseContext(arg.Context);

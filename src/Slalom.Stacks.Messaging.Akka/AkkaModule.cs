@@ -35,8 +35,8 @@ namespace Slalom.Stacks.Messaging
         {
             base.Load(builder);
 
-            builder.RegisterType<AdminCoordinator>().AsSelf();
-            builder.RegisterType<RegistryService>().AsSelf();
+            builder.RegisterType<ServicesCoordinator>().AsSelf();
+            builder.RegisterType<ServiceRegistryActor>().AsSelf();
             builder.RegisterType<RemoteCallActor>().AsSelf();
 
             builder.RegisterAssemblyTypes(_assemblies)

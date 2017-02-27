@@ -4,6 +4,7 @@ using Akka.DI.Core;
 using Autofac;
 using System.Linq;
 using Akka.Routing;
+using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Reflection;
 using Slalom.Stacks.Validation;
 
@@ -43,7 +44,7 @@ namespace Slalom.Stacks.Messaging.Routing
         /// <returns><c>true</c> if the request was successful, <c>false</c> otherwise.</returns>
         protected virtual bool Execute(AkkaRequest request)
         {
-            var registry = _components.Resolve<LocalRegistry>();
+            var registry = _components.Resolve<ServiceRegistry>();
             var entries = registry.Find(request.Message);
             var types = _components.Resolve<IDiscoverTypes>();
 
@@ -69,7 +70,7 @@ namespace Slalom.Stacks.Messaging.Routing
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
                         var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == this.Path + "/" + name))
-                                   ?? typeof(UseCaseActor<,>).MakeGenericType(entry.Type, request.Message.GetType());
+                                   ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(entry.Type), request.Message.GetType());
                         try
                         {
                             Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);

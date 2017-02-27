@@ -14,6 +14,7 @@ using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Messaging.Logging;
+using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Messaging.Routing;
 #pragma warning disable 4014
 
@@ -70,10 +71,12 @@ namespace ConsoleClient
                         e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
 
+                    Console.WriteLine(JsonConvert.SerializeObject(stack.Container.Resolve<ServiceRegistry>(), Formatting.Indented));
+
                     //var tasks = new List<Task>();
                     //for (int i = 0; i < 10; i++)
                     //{
-                        stack.Send("remote").Wait();
+                    //stack.Send("remote").Wait();
                     //}
 
                     //Task.WaitAll(tasks.ToArray());

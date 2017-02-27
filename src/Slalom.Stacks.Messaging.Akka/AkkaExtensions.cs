@@ -9,6 +9,7 @@ using Autofac;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Logging;
+using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Messaging.Routing;
 
 // ReSharper disable ObjectCreationAsStatement
@@ -30,13 +31,13 @@ namespace Slalom.Stacks.Messaging
             return instance.Container.Resolve<ActorSystem>().WhenTerminated;
         }
 
-        public static RemoteRegistry GetRegistry(this Stack instance, string path = "akka.tcp://local@localhost:8080")
+        public static ServiceRegistry GetRegistry(this Stack instance, string path = "akka.tcp://local@localhost:8080")
         {
             if (!path.EndsWith("/"))
             {
                 path += "/";
             }
-            return (RemoteRegistry)instance.Container.Resolve<ActorSystem>().ActorSelection(path + "/user/admin/registry").Ask(new GetRegistryCommand(path)).Result;
+            return (ServiceRegistry)instance.Container.Resolve<ActorSystem>().ActorSelection(path + "/user/_services/registry").Ask(new GetRegistryCommand(path)).Result;
         }
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace Slalom.Stacks.Messaging
             var system = ActorSystem.Create(options.SystemName);
             new AutoFacDependencyResolver(instance.Container, system);
 
-            system.ActorOf(system.DI().Props<AdminCoordinator>(), "admin");
+            system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
 
             instance.Use(builder =>
             {
@@ -135,16 +136,19 @@ namespace Slalom.Stacks.Messaging
                        .SingleInstance();
             });
 
-            var target = new List<RemoteRegistry>();
+
+            var registry = instance.Container.Resolve<ServiceRegistry>();
             foreach (var remote in options.Remotes)
             {
-                target.Add(instance.GetRegistry(remote));
+                var services = instance.GetRegistry(remote).Services;
+                foreach (var service in services)
+                {
+                    service.Path = remote;
+                    service.Entries.ForEach(e => e.RootPath = remote);
+                }
+                registry.Services.AddRange(services);
             }
-            instance.Use(builder =>
-            {
-                builder.Register(c => new RemoteRegistryCollection(target))
-                       .AsSelf();
-            });
+
             return instance;
         }
     }

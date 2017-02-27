@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Slalom.Stacks.Messaging.Actors;
 using Slalom.Stacks.Messaging.Logging;
+using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Runtime;
 
 namespace Slalom.Stacks.Messaging.Routing
@@ -21,7 +22,7 @@ namespace Slalom.Stacks.Messaging.Routing
         private readonly ActorSystem _system;
         private readonly IActorRef _actorRef;
         private readonly IExecutionContext _executionContext;
-        private readonly LocalRegistry _registry;
+        private readonly ServiceRegistry _registry;
         private readonly IRequestContext _requestContext;
         private readonly IEnumerable<IRequestStore> _requests;
 
@@ -34,7 +35,7 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             _system = system;
             _components = components;
-            _registry = _components.Resolve<LocalRegistry>();
+            _registry = _components.Resolve<ServiceRegistry>();
 
             _actorRef = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
             _executionContext = _components.Resolve<IExecutionContext>();
@@ -120,23 +121,21 @@ namespace Slalom.Stacks.Messaging.Routing
             var entry = _registry.Find(path);
             if (entry == null)
             {
-                var remote = _components.Resolve<RemoteRegistryCollection>().Find(path);;
-                if (remote != null)
-                {
-                    var result = await _system.ActorSelection(remote.Root + "user/admin/inbound").Ask(new RemoteCall(remote.Path, command));
-
-                    return result as MessageResult;
-                }
-
                 throw new Exception("TBD");
             }
+            if (entry.RootPath != null)
+            {
+                var result = await _system.ActorSelection(entry.RootPath + "/user/_services/remote").Ask(new RemoteCall(entry.Path, command));
 
+                return result as MessageResult;
+            }
+            
             if (String.IsNullOrWhiteSpace(command))
             {
                 command = "{}";
             }
 
-            var instance = (ICommand)JsonConvert.DeserializeObject(command, entry.RequestType);
+            var instance = (ICommand)JsonConvert.DeserializeObject(command, Type.GetType(entry.Input));
 
             var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
             _requests.ToList().ForEach(async e => await e.Append(new RequestEntry(request)));
