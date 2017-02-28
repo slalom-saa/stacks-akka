@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Akka.Actor;
-using Slalom.Stacks.Messaging.Registration;
+using Slalom.Stacks.Services;
 
 namespace Slalom.Stacks.Messaging.Services
 {

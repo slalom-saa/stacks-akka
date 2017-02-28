@@ -7,9 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Slalom.Stacks.Messaging.Logging;
-using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Runtime;
+using Slalom.Stacks.Services;
 
 namespace Slalom.Stacks.Messaging.Routing
 {
@@ -123,7 +123,7 @@ namespace Slalom.Stacks.Messaging.Routing
             {
                 throw new Exception("TBD");
             }
-            if (!entry.IsLocal())
+            if (!entry.IsLocal)
             {
                 var result = await _system.ActorSelection(entry.RootPath + "/user/_services/remote").Ask(new RemoteCall(entry.Path, command));
 
@@ -135,7 +135,7 @@ namespace Slalom.Stacks.Messaging.Routing
                 command = "{}";
             }
 
-            var instance = (ICommand)JsonConvert.DeserializeObject(command, Type.GetType(entry.Input));
+            var instance = (ICommand)JsonConvert.DeserializeObject(command, Type.GetType(entry.RequestType));
 
             var request = _requestContext.Resolve(null, instance, parentContext?.RequestContext);
             _requests.ToList().ForEach(async e => await e.Append(new RequestEntry(request)));

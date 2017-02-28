@@ -8,9 +8,9 @@ using Akka.DI.Core;
 using Autofac;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging.Logging;
-using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Messaging.Services;
+using Slalom.Stacks.Services;
 
 // ReSharper disable ObjectCreationAsStatement
 
@@ -109,15 +109,10 @@ namespace Slalom.Stacks.Messaging
             system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
 
 
-            var registry = instance.Container.Resolve<ServiceRegistry>();
+            var registry = instance.GetServices();
             foreach (var remote in options.Remotes)
             {
-                var services = instance.GetRegistry(remote).Services;
-                foreach (var service in services)
-                {
-                    service.Path = remote;
-                    registry.Services.Add(service);
-                }
+                registry.IncludeRemoteRegistry(remote, instance.GetRegistry(remote));
             }
 
             return instance;

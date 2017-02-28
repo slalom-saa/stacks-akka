@@ -4,8 +4,8 @@ using Akka.DI.Core;
 using Autofac;
 using System.Linq;
 using Akka.Routing;
-using Slalom.Stacks.Messaging.Registration;
 using Slalom.Stacks.Reflection;
+using Slalom.Stacks.Services;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing

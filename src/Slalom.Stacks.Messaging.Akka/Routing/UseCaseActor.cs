@@ -73,7 +73,7 @@ namespace Slalom.Stacks.Messaging.Routing
             else
             {
                 var item = (AkkaRequest)message;
-                var context = new MessageExecutionContext(item.Context.RequestContext, item.Context.Service, item.Context.ExecutionContext, item.Context);
+                var context = new MessageExecutionContext(item.Context.RequestContext, item.Context.EndPoint, item.Context.ExecutionContext, item.Context);
                 this.Self.Forward(new AkkaRequest(item.Message, context));
             }
         }

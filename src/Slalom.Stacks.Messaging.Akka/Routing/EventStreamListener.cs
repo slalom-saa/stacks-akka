@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Autofac;
-using Slalom.Stacks.Messaging.Registration;
+using Slalom.Stacks.Services;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing
