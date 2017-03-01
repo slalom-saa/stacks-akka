@@ -7,7 +7,7 @@ namespace Slalom.Stacks.Messaging.Services
 {
     public class RemoteCallActor : ReceiveActor
     {
-        public RemoteCallActor(IMessageGatewayAdapter messages)
+        public RemoteCallActor(IMessageGateway messages)
         {
             this.ReceiveAsync<RemoteCall>(async m =>
             {

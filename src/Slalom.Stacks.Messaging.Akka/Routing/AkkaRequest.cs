@@ -10,7 +10,7 @@ namespace Slalom.Stacks.Messaging.Routing
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="context">The context.</param>
-        public AkkaRequest(IMessage message, MessageExecutionContext context)
+        public AkkaRequest(object message, MessageExecutionContext context)
         {
             this.Message = message;
             this.Context = context;
@@ -26,6 +26,6 @@ namespace Slalom.Stacks.Messaging.Routing
         /// Gets the current message.
         /// </summary>
         /// <value>The current message.</value>
-        public IMessage Message { get; }
+        public object Message { get; }
     }
 }

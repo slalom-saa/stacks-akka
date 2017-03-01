@@ -22,12 +22,12 @@ namespace ConsoleClient.Application.Products.Add
                 throw new Exception("The current count is greater than 2.");
             }
 
-            await this.Domain.AddAsync(target);
+            await this.Domain.Add(target);
 
             var stock = await this.Send(new StockProductCommand(command.Count));
             if (!stock.IsSuccessful)
             {
-                await this.Domain.RemoveAsync(target);
+                await this.Domain.Remove(target);
 
                 throw new ChainFailedException(command, stock);
             }

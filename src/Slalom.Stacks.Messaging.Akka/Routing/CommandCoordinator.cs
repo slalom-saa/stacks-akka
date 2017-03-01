@@ -44,33 +44,38 @@ namespace Slalom.Stacks.Messaging.Routing
         /// <returns><c>true</c> if the request was successful, <c>false</c> otherwise.</returns>
         protected virtual bool Execute(AkkaRequest request)
         {
-            var registry = _components.Resolve<ServiceRegistry>();
-            var entries = registry.Find(request.Message);
+            var services = _components.Resolve<ServiceRegistry>();
+            var endPoints = services.Find(request.Message);
             var types = _components.Resolve<IDiscoverTypes>();
 
-            foreach (var entry in entries)
+            foreach (var endPoint in endPoints)
             {
-                var name = entry.Path.Substring(this.Path.Length).Trim('/');
-                if (name.Split('/').Count() > 1)
+                var name = endPoint.Path?.Substring(this.Path.Length).Trim('/') ?? "";
+                if (String.IsNullOrWhiteSpace(name))
                 {
-                    var parent = registry.Find((this.Path + "/" + name.Split('/')[0]).Trim('/'));
-                    if (Context.Child(parent.Path).Equals(ActorRefs.Nobody))
+                    name = endPoint.Type.Split(' ')[0].Replace(".", "_");
+                }
+                if (name.Split('/').Length > 1)
+                {
+                    var parent = name.Split('/')[0].Trim('/');
+                    if (Context.Child(parent).Equals(ActorRefs.Nobody))
                     {
-                        var full = (this.Path + "/" + parent.Path.Split('/').Last()).Trim('/');
+                        var full = (this.Path + "/" + parent.Split('/').Last()).Trim('/');
 
-                        var target = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == full))
+                        var firstOrDefault = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == full));
+                        var target = firstOrDefault
                                      ?? typeof(CommandCoordinator);
 
-                        Context.ActorOf(Context.DI().Props(target), parent.Path.Split('/').Last());
+                        Context.ActorOf(Context.DI().Props(target), parent.Split('/').Last());
                     }
-                    Context.Child(parent.Path.Split('/').Last()).Forward(request);
+                    Context.Child(parent.Split('/').Last()).Forward(request);
                 }
                 else
                 {
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
                         var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == this.Path + "/" + name))
-                                   ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(entry.Type), request.Message.GetType());
+                                   ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(endPoint.Type), request.Message.GetType());
                         try
                         {
                             Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);

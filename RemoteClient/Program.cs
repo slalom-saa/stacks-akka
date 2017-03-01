@@ -30,6 +30,7 @@ namespace RemoteClient
             await Task.Delay(500);
 
             Console.WriteLine("1");
+
             return new RemoteEvent("Hello");
 
         }
@@ -43,6 +44,7 @@ namespace RemoteClient
             await Task.Delay(250);
 
             Console.WriteLine("2");
+
             return new RemoteEvent("Hello 2");
         }
     }
@@ -52,6 +54,8 @@ namespace RemoteClient
     {
         public static void Main(string[] args)
         {
+            Console.Title = "Remote Client";
+
             using (var stack = new Stack())
             {
                 //stack.UseSimpleConsoleLogging();

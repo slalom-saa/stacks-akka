@@ -46,6 +46,8 @@ namespace ConsoleClient
 
         protected override bool Execute(AkkaRequest request)
         {
+            Console.WriteLine("asdfasdfas");
+
             return base.Execute(request);
         }
     }
@@ -54,9 +56,9 @@ namespace ConsoleClient
     {
         public static void Main(string[] args)
         {
+            Console.Title = "Console Client";
+
             Console.WriteLine("Press any key to halt...");
-            //Task.Run(() => StartLogger());
-            //Thread.Sleep(800);
             Task.Run(() => Start());
             Console.ReadLine();
         }
@@ -69,10 +71,28 @@ namespace ConsoleClient
                 {
                     stack.UseAkkaMessaging(e =>
                     {
-                        e.WithRemotes("akka.tcp://local@localhost:8081");
+                       // e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
 
-                    Console.WriteLine(JsonConvert.SerializeObject(stack.GetServices(), Formatting.Indented));
+                    //await stack.Send("remote", "{}");
+
+                    //var tasks = new List<Task>();
+                    //for (int i = 0; i < 10; i++)
+                    //{
+                    //    tasks.Add(stack.Send("remote", "{}"));
+                    //    tasks.Add(stack.Send("remote2", "{}"));
+                    //}
+
+                    //await Task.WhenAll(tasks);
+
+
+
+                    await stack.Send(new AddProductCommand("sadfa", 15));
+
+
+                    //Console.WriteLine(JsonConvert.SerializeObject(stack.GetServices(), Formatting.Indented));
+
+                    //Console.WriteLine(JsonConvert.SerializeObject(stack.GetServices(), Formatting.Indented));
 
                     //var tasks = new List<Task>();
                     //for (int i = 0; i < 10; i++)

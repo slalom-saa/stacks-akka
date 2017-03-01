@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Autofac;
 using System.Linq;
 using System.Reflection;
@@ -39,6 +40,9 @@ namespace Slalom.Stacks.Messaging
             builder.RegisterType<ServiceRegistryActor>().AsSelf();
             builder.RegisterType<RemoteCallActor>().AsSelf();
             builder.RegisterType<LogService>().AsSelf();
+
+            //builder.Register(c=>new List<IMessageDispatcher> { new AkkaMessageDispatcher
+            builder.RegisterType<AkkaMessageDispatcher>().As<IMessageDispatcher>().SingleInstance();
 
             builder.RegisterAssemblyTypes(_assemblies)
                    .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))

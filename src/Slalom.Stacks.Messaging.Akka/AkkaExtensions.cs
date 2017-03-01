@@ -101,9 +101,9 @@ namespace Slalom.Stacks.Messaging
 
                 builder.Register(c => system).AsSelf().SingleInstance();
 
-                builder.Register(c => new AkkaMessagingGatewayAdapter(system, c.Resolve<IComponentContext>()))
-                       .As<IMessageGatewayAdapter>()
-                       .SingleInstance();
+                //builder.Register(c => new AkkaMessageGateway(system, c.Resolve<IComponentContext>()))
+                //       .As<IMessageGateway>()
+                //       .SingleInstance();
             });
 
             system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
@@ -112,7 +112,7 @@ namespace Slalom.Stacks.Messaging
             var registry = instance.GetServices();
             foreach (var remote in options.Remotes)
             {
-                registry.IncludeRemoteRegistry(remote, instance.GetRegistry(remote));
+                registry.IncludeRemoteServices(remote, instance.GetRegistry(remote));
             }
 
             return instance;

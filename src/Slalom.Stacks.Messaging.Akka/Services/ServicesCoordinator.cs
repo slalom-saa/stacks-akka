@@ -17,6 +17,6 @@ namespace Slalom.Stacks.Messaging.Services
             Context.ActorOf(Context.DI().Props<ServiceRegistryActor>(), "registry");
             Context.ActorOf(Context.DI().Props<RemoteCallActor>().WithRouter(new RoundRobinPool(15)), "remote");
             Context.ActorOf(Context.DI().Props<LogService>().WithRouter(new RoundRobinPool(15)), "logs");
-        }
+        }   
     }
 }
