@@ -7,6 +7,8 @@ namespace ConsoleClient.Application.Products.Add
     {
         public override void Execute(AddProductEvent message)
         {
+
+            Console.WriteLine(this.Message.Id);
             Console.WriteLine("Sending mail.");
         }
     }

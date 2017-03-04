@@ -28,7 +28,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
             _components = components;
 
-            this.Receive<AkkaRequest>(e => this.Execute(e));
+            this.Receive<MessageExecutionContext>(e => this.Execute(e));
         }
 
         /// <summary>
@@ -42,13 +42,12 @@ namespace Slalom.Stacks.Messaging.Routing
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns><c>true</c> if the request was successful, <c>false</c> otherwise.</returns>
-        protected virtual bool Execute(AkkaRequest request)
+        protected virtual bool Execute(MessageExecutionContext request)
         {
-            var services = _components.Resolve<ServiceRegistry>();
-            var endPoint = services.Find(request.Context.Request.Path, request.Context.Request.Message);
             var types = _components.Resolve<IDiscoverTypes>();
+            var endPoint = request.EndPoint;
 
-//            foreach (var endPoint in endPoints)
+            //foreach (var endPoint in endPoints)
             {
                 var name = endPoint.Path?.Substring(this.Path.Length).Trim('/') ?? "";
                 if (String.IsNullOrWhiteSpace(name))
@@ -75,7 +74,7 @@ namespace Slalom.Stacks.Messaging.Routing
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
                         var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<EndPointAttribute>().Any(x => x.Path == this.Path + "/" + name))
-                                   ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(endPoint.Type), request.Message.GetType());
+                                   ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(endPoint.Type), request.Request.Message.GetType());
                         try
                         {
                             Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);

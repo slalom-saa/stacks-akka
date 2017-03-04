@@ -44,7 +44,7 @@ namespace Slalom.Stacks.Messaging
             }
             else
             {
-                await _actorRef.Ask(new AkkaRequest(request.Message, context));
+                await _actorRef.Ask(context);
             }
 
 

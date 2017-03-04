@@ -100,14 +100,9 @@ namespace Slalom.Stacks.Messaging
                 builder.RegisterModule(new AkkaModule(instance.Assemblies));
 
                 builder.Register(c => system).AsSelf().SingleInstance();
-
-                //builder.Register(c => new AkkaMessageGateway(system, c.Resolve<IComponentContext>()))
-                //       .As<IMessageGateway>()
-                //       .SingleInstance();
             });
 
             system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
-
 
             var registry = instance.GetServices();
             foreach (var remote in options.Remotes)

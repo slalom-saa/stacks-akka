@@ -28,7 +28,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
             _handler = handler;
 
-            this.ReceiveAsync<AkkaRequest>(this.Execute);
+            this.ReceiveAsync<MessageExecutionContext>(this.Execute);
         }
 
         /// <summary>
@@ -42,23 +42,23 @@ namespace Slalom.Stacks.Messaging.Routing
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A task for asynchronous programming.</returns>
-        protected virtual async Task Execute(AkkaRequest request)
+        protected virtual async Task Execute(MessageExecutionContext request)
         {
             Argument.NotNull(request, nameof(request));
 
             if (_handler is IUseMessageContext)
             {
-                ((IUseMessageContext)_handler).UseContext(request.Context);
+                ((IUseMessageContext)_handler).UseContext(request);
             }
 
-            await _handler.Handle((IMessage)request.Message);
+            await _handler.Handle((IMessage)request.Request.Message);
 
-            if (request.Context.Exception != null)
+            if (request.Exception != null)
             {
-                throw request.Context.Exception;
+                throw request.Exception;
             }
 
-            this.Sender.Tell(new MessageResult(request.Context));
+            this.Sender.Tell(new MessageResult(request));
         }
 
         /// <inheritdoc />
@@ -68,13 +68,13 @@ namespace Slalom.Stacks.Messaging.Routing
 
             if (_currentRetries >= this.Retries)
             {
-                this.Sender.Tell(new MessageResult(((AkkaRequest)message).Context));
+                this.Sender.Tell(new MessageResult((MessageExecutionContext)message));
             }
             else
             {
-                var item = (AkkaRequest)message;
-                var context = new MessageExecutionContext(item.Context.Request, item.Context.EndPoint, item.Context.ExecutionContext, item.Context);
-                this.Self.Forward(new AkkaRequest(item.Message, context));
+                var item = (MessageExecutionContext)message;
+                var context = new MessageExecutionContext(item.Request, item.EndPoint, item.ExecutionContext, item);
+                this.Self.Forward(item);
             }
         }
     }

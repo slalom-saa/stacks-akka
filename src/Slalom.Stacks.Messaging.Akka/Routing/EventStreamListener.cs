@@ -27,19 +27,19 @@ namespace Slalom.Stacks.Messaging.Routing
             _components = components;
             _registry = components.Resolve<ServiceRegistry>();
 
-            this.ReceiveAsync<AkkaRequest>(this.Execute);
+            this.ReceiveAsync<MessageExecutionContext>(this.Execute);
         }
 
-        private async Task Execute(AkkaRequest arg)
+        private async Task Execute(MessageExecutionContext arg)
         {
-            foreach (var entry in new [] { _registry.Find(arg.Context.Request.Path, arg.Context.Request.Message) })
+            foreach (var entry in new [] { _registry.Find(arg.Request.Path, arg.Request.Message) })
             {
                 var handler = _components.Resolve(Type.GetType(entry.Type));
                 if (handler is IUseMessageContext)
                 {
-                    ((IUseMessageContext)handler).UseContext(arg.Context);
+                    ((IUseMessageContext)handler).UseContext(arg);
                 }
-                await (Task)typeof(IHandle<>).MakeGenericType(arg.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { arg.Message });
+                await (Task)typeof(IHandle<>).MakeGenericType(arg.Request.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { arg.Request.Message });
             }
         }
     }

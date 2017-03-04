@@ -31,7 +31,7 @@ namespace ConsoleClient
 
         public override int Retries => 3;
 
-        protected override Task Execute(AkkaRequest request)
+        protected override Task Execute(MessageExecutionContext request)
         {
             return base.Execute(request);
         }
@@ -44,7 +44,7 @@ namespace ConsoleClient
         {
         }
 
-        protected override bool Execute(AkkaRequest request)
+        protected override bool Execute(MessageExecutionContext request)
         {
             return base.Execute(request);
         }
@@ -71,6 +71,8 @@ namespace ConsoleClient
                     {
                        // e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
+
+
 
                     //await stack.Send("remote", "{}");
 
