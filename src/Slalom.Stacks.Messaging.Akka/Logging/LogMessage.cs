@@ -7,7 +7,7 @@ namespace Slalom.Stacks.Messaging.Logging
     /// A message that is passed from the Akka.NET logging client the logging service.
     /// </summary>
     /// <seealso cref="Slalom.Stacks.Messaging.Message" />
-    public class LogMessage : Message
+    public class LogMessage
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LogMessage"/> class.

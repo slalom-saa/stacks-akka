@@ -18,13 +18,14 @@ namespace Slalom.Stacks.Messaging
         private readonly ActorSystem _system;
         private IActorRef _actorRef;
         private IExecutionContext _executionContext;
+        private ServiceRegistry _services;
 
         public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)
         {
             _system = system;
             _actorRef = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
-
             _executionContext = components.Resolve<IExecutionContext>();
+            _services = components.Resolve<ServiceRegistry>();
         }
 
         public async Task<MessageResult> Dispatch(RequestContext request, EndPoint endPoint, MessageExecutionContext parentContext)
@@ -34,7 +35,7 @@ namespace Slalom.Stacks.Messaging
 
             if (endPoint.RootPath.StartsWith("akka.tcp"))
             {
-                var content = request.Message;
+                var content = request.Message.Body;
                 if (!(content is String))
                 {
                     content = JsonConvert.SerializeObject(content);
@@ -45,6 +46,7 @@ namespace Slalom.Stacks.Messaging
             {
                 await _actorRef.Ask(new AkkaRequest(request.Message, context));
             }
+
 
             return new MessageResult(context);
         }

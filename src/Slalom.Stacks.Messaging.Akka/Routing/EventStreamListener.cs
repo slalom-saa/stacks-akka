@@ -32,7 +32,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
         private async Task Execute(AkkaRequest arg)
         {
-            foreach (var entry in _registry.Find(arg.Message))
+            foreach (var entry in new [] { _registry.Find(arg.Context.Request.Path, arg.Context.Request.Message) })
             {
                 var handler = _components.Resolve(Type.GetType(entry.Type));
                 if (handler is IUseMessageContext)

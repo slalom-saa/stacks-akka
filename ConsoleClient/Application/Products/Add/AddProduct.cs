@@ -4,10 +4,11 @@ using ConsoleClient.Application.Products.Stock;
 using ConsoleClient.Domain.Products;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Messaging.Exceptions;
+using Slalom.Stacks.Services;
 
 namespace ConsoleClient.Application.Products.Add
 {
-    [Path("products/add")]
+    [EndPoint("products/add")]
     public class AddProduct : UseCase<AddProductCommand, AddProductEvent>
     {
         private int _count = 0;
@@ -29,7 +30,7 @@ namespace ConsoleClient.Application.Products.Add
             {
                 await this.Domain.Remove(target);
 
-                throw new ChainFailedException(command, stock);
+                throw new ChainFailedException(this.Message, stock);
             }
 
             return new AddProductEvent();

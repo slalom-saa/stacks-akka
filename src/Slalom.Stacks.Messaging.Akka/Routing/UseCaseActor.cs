@@ -12,7 +12,7 @@ namespace Slalom.Stacks.Messaging.Routing
     /// <typeparam name="THandler">The type of the handler.</typeparam>
     /// <typeparam name="TMessage">The type of the message.</typeparam>
     /// <seealso cref="Akka.Actor.ReceiveActor" />
-    public class UseCaseActor<THandler, TMessage> : ReceiveActor where THandler : IHandle<TMessage>
+    public class UseCaseActor<THandler, TMessage> : ReceiveActor where THandler : IHandle where TMessage : class
     {
         private readonly THandler _handler;
 
@@ -51,7 +51,7 @@ namespace Slalom.Stacks.Messaging.Routing
                 ((IUseMessageContext)_handler).UseContext(request.Context);
             }
 
-            await _handler.Handle((TMessage)request.Message);
+            await _handler.Handle((IMessage)request.Message);
 
             if (request.Context.Exception != null)
             {

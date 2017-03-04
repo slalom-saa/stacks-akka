@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Slalom.Stacks.Messaging.Services
 {
-    public class GetRegistryCommand : Command
+    public class GetRegistryCommand
     {
         public string RemotePath { get; }
 

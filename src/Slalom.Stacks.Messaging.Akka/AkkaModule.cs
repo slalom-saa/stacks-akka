@@ -42,7 +42,7 @@ namespace Slalom.Stacks.Messaging
             builder.RegisterType<LogService>().AsSelf();
 
             //builder.Register(c=>new List<IMessageDispatcher> { new AkkaMessageDispatcher
-            builder.RegisterType<AkkaMessageDispatcher>().As<IMessageDispatcher>().SingleInstance();
+            builder.Register(c => new[] { new AkkaMessageDispatcher(c.Resolve<ActorSystem>(), c.Resolve<IComponentContext>()) }).As<IEnumerable<IMessageDispatcher>>();
 
             builder.RegisterAssemblyTypes(_assemblies)
                    .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))

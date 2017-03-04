@@ -7,7 +7,7 @@ namespace ConsoleClient.Application.Products.Add
     {
         public override void Execute(AddProductEvent message)
         {
-            //Console.WriteLine("Sending other.");
+            Console.WriteLine("Sending other.");
         }
     }
 }

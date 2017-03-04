@@ -21,7 +21,7 @@ using Slalom.Stacks.Services;
 
 namespace ConsoleClient
 {
-    [Path("products/add")]
+    [EndPoint("products/add")]
     public class B : UseCaseActor<AddProduct, AddProductCommand>
     {
         public B(AddProduct handler)
@@ -37,7 +37,7 @@ namespace ConsoleClient
         }
     }
 
-    [Path("products")]
+    [EndPoint("products")]
     public class AC : CommandCoordinator
     {
         public AC(IComponentContext components) : base(components)
@@ -46,8 +46,6 @@ namespace ConsoleClient
 
         protected override bool Execute(AkkaRequest request)
         {
-            Console.WriteLine("asdfasdfas");
-
             return base.Execute(request);
         }
     }
@@ -86,7 +84,7 @@ namespace ConsoleClient
                     //await Task.WhenAll(tasks);
 
 
-
+                    //stack.UseSimpleConsoleLogging();
                     await stack.Send(new AddProductCommand("sadfa", 15));
 
 

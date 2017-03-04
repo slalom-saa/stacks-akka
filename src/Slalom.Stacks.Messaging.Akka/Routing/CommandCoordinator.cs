@@ -45,10 +45,10 @@ namespace Slalom.Stacks.Messaging.Routing
         protected virtual bool Execute(AkkaRequest request)
         {
             var services = _components.Resolve<ServiceRegistry>();
-            var endPoints = services.Find(request.Message);
+            var endPoint = services.Find(request.Context.Request.Path, request.Context.Request.Message);
             var types = _components.Resolve<IDiscoverTypes>();
 
-            foreach (var endPoint in endPoints)
+//            foreach (var endPoint in endPoints)
             {
                 var name = endPoint.Path?.Substring(this.Path.Length).Trim('/') ?? "";
                 if (String.IsNullOrWhiteSpace(name))
@@ -62,7 +62,7 @@ namespace Slalom.Stacks.Messaging.Routing
                     {
                         var full = (this.Path + "/" + parent.Split('/').Last()).Trim('/');
 
-                        var firstOrDefault = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == full));
+                        var firstOrDefault = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<EndPointAttribute>().Any(x => x.Path == full));
                         var target = firstOrDefault
                                      ?? typeof(CommandCoordinator);
 
@@ -74,7 +74,7 @@ namespace Slalom.Stacks.Messaging.Routing
                 {
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
-                        var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<PathAttribute>().Any(x => x.Path == this.Path + "/" + name))
+                        var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<EndPointAttribute>().Any(x => x.Path == this.Path + "/" + name))
                                    ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(endPoint.Type), request.Message.GetType());
                         try
                         {
