@@ -7,15 +7,16 @@ using Akka.Actor;
 using Akka.Configuration;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
-using ConsoleClient.Aspects;
 using ConsoleClient.Domain.Products;
 using Newtonsoft.Json;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Messaging.Application;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Text;
 
 #pragma warning disable 4014
 
@@ -65,14 +66,12 @@ namespace ConsoleClient
         {
             try
             {
-                using (var stack = new Stack())
+                using (var stack = new Stack(typeof(AddProduct), typeof(GetAkkaStatus)))
                 {
                     stack.UseAkkaMessaging(e =>
                     {
-                       // e.WithRemotes("akka.tcp://local@localhost:8081");
+                        // e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
-
-
 
                     //await stack.Send("remote", "{}");
 
@@ -87,7 +86,14 @@ namespace ConsoleClient
 
 
                     //stack.UseSimpleConsoleLogging();
-                    await stack.Send(new AddProductCommand("sadfa", 15));
+                    //await stack.Send(new AddProductCommand("sadfa", 15));
+
+                    Console.WriteLine(stack.Send(new GetUptimeCommand()).Result.ToJson());
+
+                    //foreach (var service in stack.GetServices().Services.SelectMany(e => e.EndPoints))
+                    //{
+                    //    Console.WriteLine(service.Type);
+                    //}
 
 
                     //Console.WriteLine(JsonConvert.SerializeObject(stack.GetServices(), Formatting.Indented));

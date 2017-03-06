@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
@@ -28,25 +29,41 @@ namespace Slalom.Stacks.Messaging
             _services = components.Resolve<ServiceRegistry>();
         }
 
-        public async Task<MessageResult> Dispatch(RequestContext request, EndPoint endPoint, MessageExecutionContext parentContext)
+        public async Task<MessageResult> Dispatch(RequestContext request, EndPoint endPoint, MessageExecutionContext parentContext, TimeSpan? timeout = null)
         {
-            var executionContext = _executionContext.Resolve();
-            var context = new MessageExecutionContext(request, endPoint, executionContext, parentContext);
-
-            if (endPoint.RootPath.StartsWith("akka.tcp"))
+            CancellationTokenSource source;
+            if (timeout.HasValue || endPoint.Timeout.HasValue)
             {
-                var content = request.Message.Body;
-                if (!(content is String))
-                {
-                    content = JsonConvert.SerializeObject(content);
-                }
-                await _system.ActorSelection(endPoint.RootPath + "/user/_services/remote").Ask(new RemoteCall(endPoint.Path, (string)content));
+                source = new CancellationTokenSource(timeout ?? endPoint.Timeout.Value);
             }
             else
             {
-                await _actorRef.Ask(context);
+                source = new CancellationTokenSource();
             }
 
+            var executionContext = _executionContext.Resolve();
+            var context = new MessageExecutionContext(request, endPoint, executionContext, source.Token, parentContext);
+
+            try
+            {
+                if (endPoint.RootPath.StartsWith("akka.tcp"))
+                {
+                    var content = request.Message.Body;
+                    if (!(content is String))
+                    {
+                        content = JsonConvert.SerializeObject(content);
+                    }
+                    await _system.ActorSelection(endPoint.RootPath + "/user/_services/remote").Ask(new RemoteCall(endPoint.Path, (string)content), source.Token);
+                }
+                else
+                {
+                    await _actorRef.Ask(context, source.Token);
+                }
+            }
+            catch (Exception exception)
+            {
+                context.SetException(exception);
+            }
 
             return new MessageResult(context);
         }

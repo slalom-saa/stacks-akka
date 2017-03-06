@@ -73,7 +73,7 @@ namespace Slalom.Stacks.Messaging.Routing
             else
             {
                 var item = (MessageExecutionContext)message;
-                var context = new MessageExecutionContext(item.Request, item.EndPoint, item.ExecutionContext, item);
+                var context = new MessageExecutionContext(item.Request, item.EndPoint, item.ExecutionContext, item.CancellationToken, item);
                 this.Self.Forward(item);
             }
         }

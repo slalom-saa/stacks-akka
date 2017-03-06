@@ -8,6 +8,7 @@ using Akka.DI.Core;
 using Autofac;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging.Logging;
+using Slalom.Stacks.Messaging.Persistence;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Services;
@@ -97,7 +98,7 @@ namespace Slalom.Stacks.Messaging
 
             instance.Use(builder =>
             {
-                builder.RegisterModule(new AkkaModule(instance.Assemblies));
+                builder.RegisterModule(new AkkaModule(instance));
 
                 builder.Register(c => system).AsSelf().SingleInstance();
             });

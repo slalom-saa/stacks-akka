@@ -4,7 +4,8 @@
 #>
 
 param (
-    $Configuration = "DEBUG"
+    $Configuration = "DEBUG",
+    $IncrementVersion = $true
 )
 
 function Increment-Version() {
@@ -45,7 +46,9 @@ function Go ($Path) {
     Push-Location $Path
 
     Remove-Item .\Bin -Force -Recurse
-    Increment-Version
+    if ($IncrementVersion) {
+        Increment-Version
+    }
     dotnet build
     dotnet pack --no-build --configuration $Configuration
     copy .\bin\$Configuration\*.nupkg c:\nuget\

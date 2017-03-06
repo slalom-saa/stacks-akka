@@ -9,7 +9,7 @@ using Slalom.Stacks.Services;
 
 namespace RemoteClient
 {
-    public class RemoteEvent : Event
+    public class RemoteEvent : EventData
     {
         public string Message { get; }
 

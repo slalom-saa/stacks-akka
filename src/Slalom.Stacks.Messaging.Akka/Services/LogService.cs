@@ -6,6 +6,7 @@ using Akka.Actor;
 using Autofac;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging.Logging;
+using Slalom.Stacks.Messaging.Persistence;
 
 namespace Slalom.Stacks.Messaging.Services
 {

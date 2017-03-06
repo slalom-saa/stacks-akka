@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Akka.Actor;
 using System.Linq;
 using System.Threading.Tasks;
 using Slalom.Stacks.Logging;
+using Slalom.Stacks.Messaging.Persistence;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Logging
@@ -117,6 +119,16 @@ namespace Slalom.Stacks.Messaging.Logging
         public void Warning(string template, params object[] properties)
         {
             _system.ActorSelection(_options.LogUrl).Tell(new LogMessage(LogSeverity.Warning, null, template, properties));
+        }
+
+        Task<IEnumerable<RequestEntry>> IRequestStore.GetEntries(DateTimeOffset? start, DateTimeOffset? end)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<ResponseEntry>> IResponseStore.GetEntries(DateTimeOffset? start, DateTimeOffset? end)
+        {
+            throw new NotImplementedException();
         }
     }
 }
