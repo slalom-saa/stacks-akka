@@ -16,40 +16,37 @@ using Slalom.Stacks.Messaging.Application;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 using Slalom.Stacks.Text;
 
 #pragma warning disable 4014
 
 namespace ConsoleClient
 {
-    [EndPoint("products/add")]
-    public class B : UseCaseActor<AddProduct, AddProductCommand>
-    {
-        public B(AddProduct handler)
-            : base(handler)
-        {
-        }
+    //[EndPoint("products/add")]
+    //public class B : ServiceActor<AddProduct, AddProductCommand>
+    //{
+    //    public B(AddProduct handler)
+    //        : base(handler)
+    //    {
+    //    }
 
-        public override int Retries => 3;
+    //    public override int Retries => 3;
+        
+    //}
 
-        protected override Task Execute(MessageExecutionContext request)
-        {
-            return base.Execute(request);
-        }
-    }
+    //[EndPoint("products")]
+    //public class AC : CommandCoordinator
+    //{
+    //    public AC(IComponentContext components) : base(components)
+    //    {
+    //    }
 
-    [EndPoint("products")]
-    public class AC : CommandCoordinator
-    {
-        public AC(IComponentContext components) : base(components)
-        {
-        }
-
-        protected override bool Execute(MessageExecutionContext request)
-        {
-            return base.Execute(request);
-        }
-    }
+    //    protected override bool Execute(ExecutionContext request)
+    //    {
+    //        return base.Execute(request);
+    //    }
+    //}
 
     public class Program
     {
@@ -88,7 +85,7 @@ namespace ConsoleClient
                     //stack.UseSimpleConsoleLogging();
                     //await stack.Send(new AddProductCommand("sadfa", 15));
 
-                    Console.WriteLine(stack.Send(new GetUptimeCommand()).Result.ToJson());
+                    Console.WriteLine(stack.Send(new GetAkkaStatusCommand()).Result.ToJson());
 
                     //foreach (var service in stack.GetServices().Services.SelectMany(e => e.EndPoints))
                     //{

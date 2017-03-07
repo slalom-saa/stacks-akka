@@ -2,6 +2,8 @@ using System;
 using Akka.Actor;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Slalom.Stacks.Services;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing
@@ -9,26 +11,25 @@ namespace Slalom.Stacks.Messaging.Routing
     /// <summary>
     /// An Akka.NET actor that executes a use case.
     /// </summary>
-    /// <typeparam name="THandler">The type of the handler.</typeparam>
-    /// <typeparam name="TMessage">The type of the message.</typeparam>
+    /// <typeparam name="TService">The type of the service.</typeparam>
     /// <seealso cref="Akka.Actor.ReceiveActor" />
-    public class UseCaseActor<THandler, TMessage> : ReceiveActor where THandler : IHandle where TMessage : class
+    public class ServiceActor<TService> : ReceiveActor where TService : Service
     {
-        private readonly THandler _handler;
+        private readonly TService _service;
 
         private int _currentRetries;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UseCaseActor{THandler, TMessage}"/> class.
+        /// Initializes a new instance of the <see cref="ServiceActor{TService}"/> class.
         /// </summary>
-        /// <param name="handler">The handler.</param>
-        public UseCaseActor(THandler handler)
+        /// <param name="service">The service.</param>
+        public ServiceActor(TService service)
         {
-            Argument.NotNull(handler, nameof(handler));
+            Argument.NotNull(service, nameof(service));
 
-            _handler = handler;
+            _service = service;
 
-            this.ReceiveAsync<MessageExecutionContext>(this.Execute);
+            this.ReceiveAsync<ExecutionContext>(this.Execute);
         }
 
         /// <summary>
@@ -42,16 +43,17 @@ namespace Slalom.Stacks.Messaging.Routing
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A task for asynchronous programming.</returns>
-        protected virtual async Task Execute(MessageExecutionContext request)
+        protected virtual async Task Execute(ExecutionContext request)
         {
             Argument.NotNull(request, nameof(request));
 
-            if (_handler is IUseMessageContext)
+            var service = _service as IService;
+            if (service != null)
             {
-                ((IUseMessageContext)_handler).UseContext(request);
+                service.Context = request;
             }
-
-            await _handler.Handle((IMessage)request.Request.Message);
+            
+            await (Task)typeof(IEndPoint<>).MakeGenericType(Type.GetType(request.EndPoint.RequestType)).GetMethod("Receive").Invoke(_service, new object[] { request.Request.Message.Body });
 
             if (request.Exception != null)
             {
@@ -68,12 +70,12 @@ namespace Slalom.Stacks.Messaging.Routing
 
             if (_currentRetries >= this.Retries)
             {
-                this.Sender.Tell(new MessageResult((MessageExecutionContext)message));
+                this.Sender.Tell(new MessageResult((ExecutionContext)message));
             }
             else
             {
-                var item = (MessageExecutionContext)message;
-                var context = new MessageExecutionContext(item.Request, item.EndPoint, item.ExecutionContext, item.CancellationToken, item);
+                var item = (ExecutionContext)message;
+                var context = new ExecutionContext(item.Request, item.EndPoint, item.CancellationToken, item);
                 this.Self.Forward(item);
             }
         }

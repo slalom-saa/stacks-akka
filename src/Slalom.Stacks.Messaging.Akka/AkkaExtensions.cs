@@ -12,6 +12,7 @@ using Slalom.Stacks.Messaging.Persistence;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 
 // ReSharper disable ObjectCreationAsStatement
 

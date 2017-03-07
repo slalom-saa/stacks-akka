@@ -49,7 +49,7 @@ namespace Slalom.Stacks.Messaging
                    .InstancePerDependency()
                    .PropertiesAutowired();
 
-            builder.RegisterGeneric(typeof(UseCaseActor<,>));
+            builder.RegisterGeneric(typeof(ServiceActor<>));
 
             _stack.Assemblies.CollectionChanged += (sender, args) =>
             {

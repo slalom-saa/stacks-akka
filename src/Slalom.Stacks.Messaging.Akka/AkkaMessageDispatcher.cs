@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
@@ -11,6 +12,7 @@ using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Runtime;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 
 namespace Slalom.Stacks.Messaging
 {
@@ -18,18 +20,18 @@ namespace Slalom.Stacks.Messaging
     {
         private readonly ActorSystem _system;
         private IActorRef _actorRef;
-        private IExecutionContext _executionContext;
+        private IEnvironmentContext _executionContext;
         private ServiceRegistry _services;
 
         public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)
         {
             _system = system;
             _actorRef = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
-            _executionContext = components.Resolve<IExecutionContext>();
+            _executionContext = components.Resolve<IEnvironmentContext>();
             _services = components.Resolve<ServiceRegistry>();
         }
 
-        public async Task<MessageResult> Dispatch(RequestContext request, EndPoint endPoint, MessageExecutionContext parentContext, TimeSpan? timeout = null)
+        public async Task<MessageResult> Dispatch(Request request, EndPointMetaData endPoint, ExecutionContext parentContext, TimeSpan? timeout = null)
         {
             CancellationTokenSource source;
             if (timeout.HasValue || endPoint.Timeout.HasValue)
@@ -42,7 +44,7 @@ namespace Slalom.Stacks.Messaging
             }
 
             var executionContext = _executionContext.Resolve();
-            var context = new MessageExecutionContext(request, endPoint, executionContext, source.Token, parentContext);
+            var context = new ExecutionContext(request, endPoint, source.Token, parentContext);
 
             try
             {
@@ -68,9 +70,9 @@ namespace Slalom.Stacks.Messaging
             return new MessageResult(context);
         }
 
-        public bool CanDispatch(EndPoint endPoint)
+        public bool CanDispatch(EndPointMetaData endPoint)
         {
-            return endPoint.RootPath.StartsWith("akka") || endPoint.RootPath == Service.LocalPath;
+            return endPoint.RootPath.StartsWith("akka") || endPoint.RootPath == ServiceHost.LocalPath;
         }
     }
 }

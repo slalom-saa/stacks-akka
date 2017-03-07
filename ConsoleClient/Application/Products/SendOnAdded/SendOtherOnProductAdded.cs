@@ -1,11 +1,12 @@
 using System;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Services;
 
 namespace ConsoleClient.Application.Products.Add
 {
-    public class SendOtherOnProductAdded : UseCase<AddProductEvent>
+    public class SendOtherOnProductAdded : EndPoint<AddProductEvent>
     {
-        public override void Execute(AddProductEvent message)
+        public override void Receive(AddProductEvent message)
         {
             Console.WriteLine("Sending other.");
         }

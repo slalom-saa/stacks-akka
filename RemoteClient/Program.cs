@@ -6,6 +6,7 @@ using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 
 namespace RemoteClient
 {
@@ -24,9 +25,9 @@ namespace RemoteClient
     }
 
     [EndPoint("remote")]
-    public class Remote : UseCase<RemoteCommand, RemoteEvent>
+    public class Remote : EndPoint<RemoteCommand, RemoteEvent>
     {
-        public override async Task<RemoteEvent> ExecuteAsync(RemoteCommand command)
+        public override async Task<RemoteEvent> ReceiveAsync(RemoteCommand command)
         {
             await Task.Delay(500);
 
@@ -38,9 +39,9 @@ namespace RemoteClient
     }
 
     [EndPoint("remote2")]
-    public class Remote2 : UseCase<RemoteCommand, RemoteEvent>
+    public class Remote2 : EndPoint<RemoteCommand, RemoteEvent>
     {
-        public override async Task<RemoteEvent> ExecuteAsync(RemoteCommand command)
+        public override async Task<RemoteEvent> ReceiveAsync(RemoteCommand command)
         {
             await Task.Delay(250);
 

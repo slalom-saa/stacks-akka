@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using Autofac;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing
@@ -27,17 +28,18 @@ namespace Slalom.Stacks.Messaging.Routing
             _components = components;
             _registry = components.Resolve<ServiceRegistry>();
 
-            this.ReceiveAsync<MessageExecutionContext>(this.Execute);
+            this.ReceiveAsync<ExecutionContext>(this.Execute);
         }
 
-        private async Task Execute(MessageExecutionContext arg)
+        private async Task Execute(ExecutionContext arg)
         {
             foreach (var entry in new [] { _registry.Find(arg.Request.Path, arg.Request.Message) })
             {
-                var handler = _components.Resolve(Type.GetType(entry.Type));
-                if (handler is IUseMessageContext)
+                var handler = _components.Resolve(Type.GetType(entry.ServiceType));
+                var service = handler as IService;
+                if (service != null)
                 {
-                    ((IUseMessageContext)handler).UseContext(arg);
+                    service.Context = arg;
                 }
                 await (Task)typeof(IHandle<>).MakeGenericType(arg.Request.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { arg.Request.Message });
             }

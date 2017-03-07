@@ -1,31 +1,36 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Akka.Actor;
+using Autofac;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 
 namespace Slalom.Stacks.Messaging.Application
 {
-    public class GetUptimeCommand
+    public class GetAkkaStatusCommand
     {
     }
 
     [EndPoint("_systems/akka")]
-    public class GetAkkaStatus : UseCase<GetUptimeCommand, object>
+    public class GetAkkaStatus : EndPoint<GetAkkaStatusCommand, object>
     {
-        private readonly ActorSystem _system;
+        private IComponentContext _components;
 
-        public GetAkkaStatus(ActorSystem system)
+        public GetAkkaStatus(IComponentContext components)
         {
-            _system = system;
+            _components = components;
         }
 
-        public override object Execute(GetUptimeCommand command)
+        public override object Receive(GetAkkaStatusCommand command)
         {
-            return new
-            {
-                _system.StartTime,
-                _system.Uptime
-            };
+            return _components.ResolveAll<ActorSystem>()
+                       .Select(e => new
+                       {
+                           e.Name,
+                           e.StartTime,
+                           e.Uptime
+                       });
         }
     }
 }

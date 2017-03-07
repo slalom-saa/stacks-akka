@@ -5,15 +5,16 @@ using ConsoleClient.Domain.Products;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Messaging.Exceptions;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 
 namespace ConsoleClient.Application.Products.Add
 {
     [EndPoint("products/add")]
-    public class AddProduct : UseCase<AddProductCommand, AddProductEvent>
+    public class AddProduct : EndPoint<AddProductCommand, AddProductEvent>
     {
         private int _count = 0;
 
-        public override async Task<AddProductEvent> ExecuteAsync(AddProductCommand command)
+        public override async Task<AddProductEvent> ReceiveAsync(AddProductCommand command)
         {
             var target = new Product("name");
 
@@ -30,7 +31,7 @@ namespace ConsoleClient.Application.Products.Add
             {
                 await this.Domain.Remove(target);
 
-                throw new ChainFailedException(this.Message, stock);
+                throw new ChainFailedException(this.Request.Message, stock);
             }
 
             return new AddProductEvent();

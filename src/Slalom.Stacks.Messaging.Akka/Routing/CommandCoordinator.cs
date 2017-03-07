@@ -6,6 +6,7 @@ using System.Linq;
 using Akka.Routing;
 using Slalom.Stacks.Reflection;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 using Slalom.Stacks.Validation;
 
 namespace Slalom.Stacks.Messaging.Routing
@@ -28,7 +29,7 @@ namespace Slalom.Stacks.Messaging.Routing
 
             _components = components;
 
-            this.Receive<MessageExecutionContext>(e => this.Execute(e));
+            this.Receive<ExecutionContext>(e => this.Execute(e));
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace Slalom.Stacks.Messaging.Routing
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns><c>true</c> if the request was successful, <c>false</c> otherwise.</returns>
-        protected virtual bool Execute(MessageExecutionContext request)
+        protected virtual bool Execute(ExecutionContext request)
         {
             var types = _components.Resolve<IDiscoverTypes>();
             var endPoint = request.EndPoint;
@@ -52,7 +53,7 @@ namespace Slalom.Stacks.Messaging.Routing
                 var name = endPoint.Path?.Substring(this.Path.Length).Trim('/') ?? "";
                 if (String.IsNullOrWhiteSpace(name))
                 {
-                    name = endPoint.Type.Split(' ')[0].Replace(".", "_");
+                    name = endPoint.ServiceType.Split(' ')[0].Replace(".", "_");
                 }
                 if (name.Split('/').Length > 1)
                 {
@@ -74,7 +75,7 @@ namespace Slalom.Stacks.Messaging.Routing
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
                         var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<EndPointAttribute>().Any(x => x.Path == this.Path + "/" + name))
-                                   ?? typeof(UseCaseActor<,>).MakeGenericType(Type.GetType(endPoint.Type), request.Request.Message.GetType());
+                                   ?? typeof(ServiceActor<>).MakeGenericType(Type.GetType(endPoint.ServiceType));
                         try
                         {
                             Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);
