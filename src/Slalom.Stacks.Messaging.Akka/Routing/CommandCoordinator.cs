@@ -75,7 +75,7 @@ namespace Slalom.Stacks.Messaging.Routing
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
                         var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<EndPointAttribute>().Any(x => x.Path == this.Path + "/" + name))
-                                   ?? typeof(ServiceActor<>).MakeGenericType(Type.GetType(endPoint.ServiceType));
+                                   ?? typeof(EndPointActor<>).MakeGenericType(Type.GetType(endPoint.ServiceType));
                         try
                         {
                             Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);

@@ -6,7 +6,6 @@ using Akka.Actor;
 using Autofac;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging.Logging;
-using Slalom.Stacks.Messaging.Persistence;
 
 namespace Slalom.Stacks.Messaging.Services
 {
@@ -17,8 +16,8 @@ namespace Slalom.Stacks.Messaging.Services
     public class LogService : ReceiveActor
     {
         private readonly ILogger _logger;
-        private readonly IEnumerable<IResponseStore> _reponses;
-        private readonly IEnumerable<IRequestStore> _requests;
+        private readonly IEnumerable<IResponseLog> _reponses;
+        private readonly IEnumerable<IRequestLog> _requests;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogService"/> class.
@@ -27,11 +26,11 @@ namespace Slalom.Stacks.Messaging.Services
         public LogService(IComponentContext components)
         {
             _logger = components.Resolve<ILogger>();
-            _requests = components.ResolveAll<IRequestStore>();
-            _reponses = components.ResolveAll<IResponseStore>();
+            _requests = components.ResolveAll<IRequestLog>();
+            _reponses = components.ResolveAll<IResponseLog>();
 
             this.Receive<LogMessage>(e => this.LogMessage(e));
-            this.ReceiveAsync<RequestEntry>(this.LogRequest);
+            this.ReceiveAsync<Request>(this.LogRequest);
             this.ReceiveAsync<ResponseEntry>(this.LogResponse);
         }
 
@@ -62,7 +61,7 @@ namespace Slalom.Stacks.Messaging.Services
             }
         }
 
-        private async Task LogRequest(RequestEntry entry)
+        private async Task LogRequest(Request entry)
         {
             foreach (var item in _requests)
             {

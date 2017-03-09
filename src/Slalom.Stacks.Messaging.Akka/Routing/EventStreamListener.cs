@@ -15,7 +15,6 @@ namespace Slalom.Stacks.Messaging.Routing
     public class EventStreamListener : ReceiveActor
     {
         private readonly IComponentContext _components;
-        private ServiceRegistry _registry;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStreamListener"/> class.
@@ -26,23 +25,19 @@ namespace Slalom.Stacks.Messaging.Routing
             Argument.NotNull(components, nameof(components));
 
             _components = components;
-            _registry = components.Resolve<ServiceRegistry>();
 
             this.ReceiveAsync<ExecutionContext>(this.Execute);
         }
 
-        private async Task Execute(ExecutionContext arg)
+        private async Task Execute(ExecutionContext message)
         {
-            foreach (var entry in new [] { _registry.Find(arg.Request.Path, arg.Request.Message) })
+            var handlers = _components.ResolveAll(typeof(IHandle<>).MakeGenericType(message.Request.Message.MessageType));
+            foreach (var handler in handlers)
             {
-                var handler = _components.Resolve(Type.GetType(entry.ServiceType));
-                var service = handler as IService;
-                if (service != null)
-                {
-                    service.Context = arg;
-                }
-                await (Task)typeof(IHandle<>).MakeGenericType(arg.Request.Message.GetType()).GetMethod("Handle").Invoke(handler, new object[] { arg.Request.Message });
+                await (Task)typeof(IHandle<>).MakeGenericType(message.Request.Message.MessageType).GetMethod("Handle").Invoke(handler, new[] { message.Request.Message.Body });
             }
+
+            this.Sender.Tell(new MessageResult(message));
         }
     }
 }

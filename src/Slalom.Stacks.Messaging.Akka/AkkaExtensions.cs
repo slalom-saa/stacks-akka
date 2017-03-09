@@ -8,7 +8,6 @@ using Akka.DI.Core;
 using Autofac;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging.Logging;
-using Slalom.Stacks.Messaging.Persistence;
 using Slalom.Stacks.Messaging.Routing;
 using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Services;
@@ -33,7 +32,7 @@ namespace Slalom.Stacks.Messaging
             return instance.Container.Resolve<ActorSystem>().WhenTerminated;
         }
 
-        public static ServiceRegistry GetRegistry(this Stack instance, string path = "akka.tcp://local@localhost:8080")
+        public static ServiceRegistry GetRegistry(this Stack instance, string path = "akka://local")
         {
             if (!path.EndsWith("/"))
             {
@@ -75,8 +74,8 @@ namespace Slalom.Stacks.Messaging
                        .PreserveExistingDefaults()
                        .SingleInstance()
                        .As<ILogger>()
-                       .As<IRequestStore>()
-                       .As<IResponseStore>()
+                       .As<IRequestLog>()
+                       .As<IRequestLog>()
                        .PreserveExistingDefaults();
             });
 
@@ -109,7 +108,7 @@ namespace Slalom.Stacks.Messaging
             var registry = instance.GetServices();
             foreach (var remote in options.Remotes)
             {
-                registry.IncludeRemoteServices(remote, instance.GetRegistry(remote));
+                registry.Include(instance.GetRegistry(remote));
             }
 
             return instance;

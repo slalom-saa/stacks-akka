@@ -19,16 +19,14 @@ namespace Slalom.Stacks.Messaging
     public class AkkaMessageDispatcher : IMessageDispatcher
     {
         private readonly ActorSystem _system;
-        private IActorRef _actorRef;
-        private IEnvironmentContext _executionContext;
-        private ServiceRegistry _services;
+        private IActorRef _commands;
+        private IActorRef _events;
 
         public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)
         {
             _system = system;
-            _actorRef = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
-            _executionContext = components.Resolve<IEnvironmentContext>();
-            _services = components.Resolve<ServiceRegistry>();
+            _commands = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
+            _events = system.ActorOf(system.DI().Props<EventStreamListener>(), "events");
         }
 
         public async Task<MessageResult> Dispatch(Request request, EndPointMetaData endPoint, ExecutionContext parentContext, TimeSpan? timeout = null)
@@ -43,7 +41,6 @@ namespace Slalom.Stacks.Messaging
                 source = new CancellationTokenSource();
             }
 
-            var executionContext = _executionContext.Resolve();
             var context = new ExecutionContext(request, endPoint, source.Token, parentContext);
 
             try
@@ -55,11 +52,13 @@ namespace Slalom.Stacks.Messaging
                     {
                         content = JsonConvert.SerializeObject(content);
                     }
-                    await _system.ActorSelection(endPoint.RootPath + "/user/_services/remote").Ask(new RemoteCall(endPoint.Path, (string)content), source.Token);
+
+                    var result = await _system.ActorSelection(endPoint.RootPath + "/user/_services/remote").Ask(new RemoteCall(endPoint.Path, (string)content), source.Token);
+                    return result as MessageResult;
                 }
                 else
                 {
-                    await _actorRef.Ask(context, source.Token);
+                    await _commands.Ask(context, source.Token);
                 }
             }
             catch (Exception exception)
@@ -73,6 +72,15 @@ namespace Slalom.Stacks.Messaging
         public bool CanDispatch(EndPointMetaData endPoint)
         {
             return endPoint.RootPath.StartsWith("akka") || endPoint.RootPath == ServiceHost.LocalPath;
+        }
+
+        public async Task<MessageResult> Dispatch(Request request, ExecutionContext context)
+        {
+            context = new ExecutionContext(request, context);
+
+            var result = await _events.Ask(context);
+
+            return result as MessageResult;
         }
     }
 }

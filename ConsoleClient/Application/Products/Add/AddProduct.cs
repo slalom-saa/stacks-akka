@@ -26,12 +26,18 @@ namespace ConsoleClient.Application.Products.Add
 
             await this.Domain.Add(target);
 
-            var stock = await this.Send(new StockProductCommand(command.Count));
+            var stock = await this.Send("products/stock-product", new StockProductCommand(command.Count));
             if (!stock.IsSuccessful)
             {
                 await this.Domain.Remove(target);
 
-                throw new ChainFailedException(this.Request.Message, stock);
+                throw new ChainFailedException(this.Request, stock);
+            }
+
+            var remote = await this.Send("remote", null);
+            if (!remote.IsSuccessful)
+            {
+                throw new ChainFailedException(this.Request, remote);
             }
 
             return new AddProductEvent();

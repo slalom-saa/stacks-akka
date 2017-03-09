@@ -16,7 +16,7 @@ namespace Slalom.Stacks.Messaging.Services
 
             this.Receive<GetRegistryCommand>(m =>
             {
-                this.Sender.Tell(_registry);
+                this.Sender.Tell(_registry.CreatePublicRegistry(m.RemotePath));
             });
         }
     }

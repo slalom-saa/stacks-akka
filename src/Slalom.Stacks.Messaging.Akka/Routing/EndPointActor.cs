@@ -9,21 +9,21 @@ using Slalom.Stacks.Validation;
 namespace Slalom.Stacks.Messaging.Routing
 {
     /// <summary>
-    /// An Akka.NET actor that executes a use case.
+    /// An Akka.NET actor that executes an endpoint.
     /// </summary>
     /// <typeparam name="TService">The type of the service.</typeparam>
     /// <seealso cref="Akka.Actor.ReceiveActor" />
-    public class ServiceActor<TService> : ReceiveActor where TService : Service
+    public class EndPointActor<TService> : ReceiveActor where TService : Service
     {
         private readonly TService _service;
 
         private int _currentRetries;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ServiceActor{TService}"/> class.
+        /// Initializes a new instance of the <see cref="EndPointActor{TService}"/> class.
         /// </summary>
         /// <param name="service">The service.</param>
-        public ServiceActor(TService service)
+        public EndPointActor(TService service)
         {
             Argument.NotNull(service, nameof(service));
 
@@ -75,7 +75,6 @@ namespace Slalom.Stacks.Messaging.Routing
             else
             {
                 var item = (ExecutionContext)message;
-                var context = new ExecutionContext(item.Request, item.EndPoint, item.CancellationToken, item);
                 this.Self.Forward(item);
             }
         }

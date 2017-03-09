@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Messaging.Events;
 using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Registry;
 
 namespace RemoteClient
 {
-    public class RemoteEvent : EventData
+    public class RemoteEvent : Event
     {
         public string Message { get; }
 
@@ -60,7 +61,7 @@ namespace RemoteClient
 
             using (var stack = new Stack())
             {
-                //stack.UseSimpleConsoleLogging();
+                stack.UseSimpleConsoleLogging();
 
                 stack.RunAkkaHost();
             }
