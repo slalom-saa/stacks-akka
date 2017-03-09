@@ -289,7 +289,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "Slalom.Stacks/1.4.84": {
+      "Slalom.Stacks/1.4.85": {
         "type": "package",
         "dependencies": {
           "Autofac": "4.3.0",
@@ -1362,12 +1362,12 @@
         "tools/install.ps1"
       ]
     },
-    "Slalom.Stacks/1.4.84": {
-      "sha512": "N4Bbn40QZlrzCg3Mfarb4QNr5zLxJxHxZ+MuJJK8i2HDztKY2v9thYqHS3D5cuBjGY6h3yw/z5iL+LKFZVJL5Q==",
+    "Slalom.Stacks/1.4.85": {
+      "sha512": "T+cmS3DJU1dhpI8wmamhS/bv8Vi4Ts/rQWI5nv3InsEXagPfVCIijw3m+T5Q4Hy3Y4dd8zUsB3Xk/SwCe12TXQ==",
       "type": "package",
-      "path": "Slalom.Stacks/1.4.84",
+      "path": "Slalom.Stacks/1.4.85",
       "files": [
-        "Slalom.Stacks.1.4.84.nupkg.sha512",
+        "Slalom.Stacks.1.4.85.nupkg.sha512",
         "Slalom.Stacks.nuspec",
         "lib/net461/Slalom.Stacks.dll",
         "lib/net461/Slalom.Stacks.xml"
@@ -1571,7 +1571,7 @@
       ]
     },
     "System.ComponentModel/4.0.1": {
-      "sha512": "oBZFnm7seFiVfugsIyOvQCWobNZs7FzqDV/B7tx20Ep/l3UUFCPDkdTnCNaJZTU27zjeODmy2C/cP60u3D4c9w==",
+      "sha512": "DysRJLI4fObfEt07Cc77qTQcBX3BrWdSkRK5ekG4XsflrXdpaabo3chbQ+Lri9aH5HECS4CVSTjd248wF2h63g==",
       "type": "package",
       "path": "System.ComponentModel/4.0.1",
       "files": [
@@ -4082,7 +4082,7 @@
       ]
     },
     "System.Xml.XPath/4.0.1": {
-      "sha512": "UWd1H+1IJ9Wlq5nognZ/XJdyj8qPE4XufBUkAW59ijsCPjZkZe0MUzKKJFBr+ZWBe5Wq1u1d5f2CYgE93uH7DA==",
+      "sha512": "rVyOCJiloCXs39i8bTvcyIXE0s2NEveTbcv1CbXVuJQS70Iu/2ZT79i57gz+/luSddECz4PGi00o4zcqtCsxzQ==",
       "type": "package",
       "path": "System.Xml.XPath/4.0.1",
       "files": [
@@ -4119,7 +4119,7 @@
       ]
     },
     "System.Xml.XPath.XDocument/4.0.1": {
-      "sha512": "FLhdYJx4331oGovQypQ8JIw2kEmNzCsjVOVYY/16kZTUoquZG85oVn7yUhBE2OZt1yGPSXAL0HTEfzjlbNpM7Q==",
+      "sha512": "2Drnd5Z+X6nbqwTeVdwi1b53n7feH+qz5oPo7IsngnadASNyBzZoCAYR2q0HTeOsDM3fQLZXSy+XV6Wx3CBoWg==",
       "type": "package",
       "path": "System.Xml.XPath.XDocument/4.0.1",
       "files": [
