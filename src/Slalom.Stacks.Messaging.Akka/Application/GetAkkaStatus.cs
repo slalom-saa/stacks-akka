@@ -13,7 +13,7 @@ namespace Slalom.Stacks.Messaging.Application
     }
 
     [EndPoint("_systems/akka")]
-    public class GetAkkaStatus : EndPoint<GetAkkaStatusCommand, object>
+    public class GetAkkaStatus : SystemEndPoint<GetAkkaStatusCommand, object>
     {
         private IComponentContext _components;
 
@@ -22,15 +22,15 @@ namespace Slalom.Stacks.Messaging.Application
             _components = components;
         }
 
-        public override object Receive(GetAkkaStatusCommand command)
+        public override Task<object> Execute(GetAkkaStatusCommand command)
         {
-            return _components.ResolveAll<ActorSystem>()
+            return Task.FromResult((object)_components.ResolveAll<ActorSystem>()
                        .Select(e => new
                        {
                            e.Name,
                            e.StartTime,
                            e.Uptime
-                       });
+                       }));
         }
     }
 }

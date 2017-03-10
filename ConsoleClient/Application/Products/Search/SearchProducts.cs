@@ -8,14 +8,14 @@ using Slalom.Stacks.Services.Registry;
 
 namespace ConsoleClient.Application.Products.Search
 {
-    public class SearchProductsCommand
+    public class SearchProductsCommand : Command
     {
     }
 
     [EndPoint("products/search")]
-    public class SearchProducts : EndPoint<SearchProductsCommand, string>
+    public class SearchProducts : UseCase<SearchProductsCommand, string>
     {
-        public override async Task<string> ReceiveAsync(SearchProductsCommand command)
+        public override async Task<string> ExecuteAsync(SearchProductsCommand command)
         {
             await Task.Delay(500);
 

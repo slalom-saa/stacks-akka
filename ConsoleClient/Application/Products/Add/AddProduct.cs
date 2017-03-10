@@ -10,11 +10,11 @@ using Slalom.Stacks.Services.Registry;
 namespace ConsoleClient.Application.Products.Add
 {
     [EndPoint("products/add")]
-    public class AddProduct : EndPoint<AddProductCommand, AddProductEvent>
+    public class AddProduct : UseCase<AddProductCommand, AddProductEvent>
     {
         private int _count = 0;
 
-        public override async Task<AddProductEvent> ReceiveAsync(AddProductCommand command)
+        public override async Task<AddProductEvent> ExecuteAsync(AddProductCommand command)
         {
             var target = new Product("name");
 
@@ -34,11 +34,11 @@ namespace ConsoleClient.Application.Products.Add
                 throw new ChainFailedException(this.Request, stock);
             }
 
-            var remote = await this.Send("remote", null);
-            if (!remote.IsSuccessful)
-            {
-                throw new ChainFailedException(this.Request, remote);
-            }
+            //var remote = await this.Send("remote", null);
+            //if (!remote.IsSuccessful)
+            //{
+            //    throw new ChainFailedException(this.Request, remote);
+            //}
 
             return new AddProductEvent();
         }

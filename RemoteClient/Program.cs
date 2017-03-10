@@ -21,14 +21,14 @@ namespace RemoteClient
         }
     }
 
-    public class RemoteCommand
+    public class RemoteCommand : Command
     {
     }
 
     [EndPoint("remote")]
-    public class Remote : EndPoint<RemoteCommand, RemoteEvent>
+    public class Remote : UseCase<RemoteCommand, RemoteEvent>
     {
-        public override async Task<RemoteEvent> ReceiveAsync(RemoteCommand command)
+        public override async Task<RemoteEvent> ExecuteAsync(RemoteCommand command)
         {
             await Task.Delay(500);
 
@@ -40,9 +40,9 @@ namespace RemoteClient
     }
 
     [EndPoint("remote2")]
-    public class Remote2 : EndPoint<RemoteCommand, RemoteEvent>
+    public class Remote2 : UseCase<RemoteCommand, RemoteEvent>
     {
-        public override async Task<RemoteEvent> ReceiveAsync(RemoteCommand command)
+        public override async Task<RemoteEvent> ExecuteAsync(RemoteCommand command)
         {
             await Task.Delay(250);
 

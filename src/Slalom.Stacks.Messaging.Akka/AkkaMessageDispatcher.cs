@@ -58,7 +58,8 @@ namespace Slalom.Stacks.Messaging
                 }
                 else
                 {
-                    await _commands.Ask(context, source.Token);
+                    var result = await _commands.Ask(context, source.Token);
+                    return result as MessageResult;
                 }
             }
             catch (Exception exception)

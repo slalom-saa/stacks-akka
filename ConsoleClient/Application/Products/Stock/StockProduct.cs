@@ -8,9 +8,9 @@ using Slalom.Stacks.Services.Registry;
 namespace ConsoleClient.Application.Products.Stock
 {
     [EndPoint("products/stock-product")]
-    public class StockProduct : EndPoint<StockProductCommand>
+    public class StockProduct : UseCase<StockProductCommand>
     {
-        public override async Task ReceiveAsync(StockProductCommand command)
+        public override async Task ExecuteAsync(StockProductCommand command)
         {
             await Task.Delay(500);
         }
