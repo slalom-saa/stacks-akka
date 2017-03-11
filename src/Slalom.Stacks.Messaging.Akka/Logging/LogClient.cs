@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Akka.Actor;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,9 +12,9 @@ namespace Slalom.Stacks.Messaging.Logging
     /// A logging client that sends traces, requests and responses to a remote actor.
     /// </summary>
     /// <seealso cref="Slalom.Stacks.Logging.ILogger" />
-    public class LogClient : ILogger, IRequestStore, IResponseStore
+    public class LogClient : ILogger, IRequestLog, IResponseLog
     {
-        private readonly MessagingOptions _options;
+        private readonly LoggingOptions _options;
         private readonly ActorSystem _system;
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace Slalom.Stacks.Messaging.Logging
         /// </summary>
         /// <param name="system">The configured actor system.</param>
         /// <param name="options">The configured options.</param>
-        public LogClient(ActorSystem system, MessagingOptions options)
+        public LogClient(ActorSystem system, LoggingOptions options)
         {
             Argument.NotNull(system, nameof(system));
             Argument.NotNull(options, nameof(options));
@@ -31,9 +32,9 @@ namespace Slalom.Stacks.Messaging.Logging
         }
 
         /// <inheritdoc />
-        public Task Append(RequestEntry entry)
+        public Task Append(Request entry)
         {
-            return _system.ActorSelection(_options.LogUrl).Ask(entry);
+            return _system.ActorSelection(_options.LogUrl).Ask(new RequestEntry(entry));
         }
 
         /// <inheritdoc />
@@ -117,6 +118,16 @@ namespace Slalom.Stacks.Messaging.Logging
         public void Warning(string template, params object[] properties)
         {
             _system.ActorSelection(_options.LogUrl).Tell(new LogMessage(LogSeverity.Warning, null, template, properties));
+        }
+
+        Task<IEnumerable<RequestEntry>> IRequestLog.GetEntries(DateTimeOffset? start, DateTimeOffset? end)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<ResponseEntry>> IResponseLog.GetEntries(DateTimeOffset? start, DateTimeOffset? end)
+        {
+            throw new NotImplementedException();
         }
     }
 }

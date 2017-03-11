@@ -3,118 +3,82 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Akka.Actor;
 using Akka.Configuration;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
-using ConsoleClient.Aspects;
 using ConsoleClient.Domain.Products;
+using Newtonsoft.Json;
 using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Messaging.Application;
 using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
+using Slalom.Stacks.Text;
+
 #pragma warning disable 4014
 
 namespace ConsoleClient
 {
-    [Path("products/add")]
-    public class B : UseCaseActor<AddProduct, AddProductCommand>
+    //[EndPoint("products/add")]
+    //public class B : ServiceActor<AddProduct, AddProductCommand>
+    //{
+    //    public B(AddProduct handler)
+    //        : base(handler)
+    //    {
+    //    }
+
+    //    public override int Retries => 3;
+
+    //}
+
+    [EndPoint("products/add")]
+    public class AC : EndPointHost<AddProduct>
     {
-        public B(AddProduct handler)
-            : base(handler)
+        public AC(AddProduct service)
+            : base(service)
         {
         }
 
         public override int Retries => 3;
-
-        protected override Task Execute(AkkaRequest request)
-        {
-            return base.Execute(request);
-        }
-    }
-
-    [Path("products")]
-    public class AC : CommandCoordinator
-    {
-        public AC(IComponentContext components) : base(components)
-        {
-        }
-
-        protected override bool Execute(AkkaRequest request)
-        {
-            return base.Execute(request);
-        }
     }
 
     public class Program
     {
+        [STAThread]
         public static void Main(string[] args)
         {
-            Console.WriteLine("Press any key to halt...");
-            //Task.Run(() => StartLogger());
-            //Thread.Sleep(800);
-            Task.Run(() => Start());
-            Console.ReadLine();
-        }
+            Console.Title = "Console Client";
 
-        private static async Task Start()
-        {
             try
             {
-                using (var stack = new Stack(typeof(Program)))
+                using (var stack = new Stack(typeof(AddProduct), typeof(GetAkkaStatus)))
                 {
-                    //stack.UseSimpleConsoleLogging();
                     stack.UseAkkaMessaging(e =>
                     {
-                        e.WithLoggingClient("akka.tcp://logging@localhost:8080/user/log");
+                        //e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
 
-                    stack.UseAkkaLoggingService();
 
-                    stack.Use(builder =>
-                    {
-                        // builder.RegisterType<ProductsCommandCoordinator>().As<CommandCoordinator>();
-                        //   builder.RegisterType<RequestStore>().As<IRequestStore>();
-                        //  builder.RegisterType<ResponseStore>().As<IResponseStore>();
-                    });
-
-                    var tasks = new List<Task>
-                    {
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("", 20)),
-                        stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
-                        //stack.Send("products/add", new AddProductCommand("asdf", 20)),
+                    //var result = stack.Send("remote").Result;
 
 
+                    //Console.WriteLine(result.ToJson());
 
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20)),
+                    stack.Send(new AddProductCommand("afd", 14)).Wait();
+                    stack.Send(new AddProductCommand("afd", 14)).Wait();
 
-                        //stack.Send("items/add-item", new AddProductCommand("asdf", 20))
+                    var x = stack.Send(new AddProductCommand("afd", 14)).Result;
 
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15)),
-                        //stack.Send("items/add-item", new AddProductCommand("adsf", 15))
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}"),
-                        ////stack.SendAsync("items/search", "{}")
-                    };
+                    Console.WriteLine(x.ToJson());
+                    Console.WriteLine("exit");
 
-                    await Task.WhenAll(tasks);
 
-                    Console.WriteLine("...");
-                    Console.WriteLine((await stack.Domain.FindAsync<Product>()).Count());
-
-                    await stack.GetExit();
+                    Console.ReadKey();
                 }
             }
             catch (Exception exception)

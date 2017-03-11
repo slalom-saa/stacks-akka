@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Autofac;
 using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Autofac;
 using Slalom.Stacks.Logging;
+using Slalom.Stacks.Messaging.Logging;
 
-namespace Slalom.Stacks.Messaging.Logging
+namespace Slalom.Stacks.Messaging.Services
 {
     /// <summary>
     /// Default logging actor that takes traces, requests and responses.
@@ -15,8 +16,8 @@ namespace Slalom.Stacks.Messaging.Logging
     public class LogService : ReceiveActor
     {
         private readonly ILogger _logger;
-        private readonly IEnumerable<IResponseStore> _reponses;
-        private readonly IEnumerable<IRequestStore> _requests;
+        private readonly IEnumerable<IResponseLog> _reponses;
+        private readonly IEnumerable<IRequestLog> _requests;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogService"/> class.
@@ -25,11 +26,11 @@ namespace Slalom.Stacks.Messaging.Logging
         public LogService(IComponentContext components)
         {
             _logger = components.Resolve<ILogger>();
-            _requests = components.ResolveAll<IRequestStore>();
-            _reponses = components.ResolveAll<IResponseStore>();
+            _requests = components.ResolveAll<IRequestLog>();
+            _reponses = components.ResolveAll<IResponseLog>();
 
             this.Receive<LogMessage>(e => this.LogMessage(e));
-            this.ReceiveAsync<RequestEntry>(this.LogRequest);
+            this.ReceiveAsync<Request>(this.LogRequest);
             this.ReceiveAsync<ResponseEntry>(this.LogResponse);
         }
 
@@ -60,7 +61,7 @@ namespace Slalom.Stacks.Messaging.Logging
             }
         }
 
-        private async Task LogRequest(RequestEntry entry)
+        private async Task LogRequest(Request entry)
         {
             foreach (var item in _requests)
             {

@@ -14,10 +14,7 @@
     "net461": {
       "dependencies": {
       },
-      "imports": "dnxcore50",
-      "frameworkAssemblies": {
-        "System.Windows.Forms": {}
-      }
+      "imports": "dnxcore50"
     }
   }
 }

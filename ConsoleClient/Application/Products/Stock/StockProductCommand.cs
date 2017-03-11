@@ -6,7 +6,7 @@ namespace ConsoleClient.Application.Products.Stock
     {
         public int ItemCount { get; }
 
-        public StockProductCommand(int itemCount)
+        public StockProductCommand(int itemCount) 
         {
             this.ItemCount = itemCount;
         }

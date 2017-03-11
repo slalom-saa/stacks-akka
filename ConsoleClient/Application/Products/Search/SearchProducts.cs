@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Slalom.Stacks.Messaging;
+using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Registry;
 
 namespace ConsoleClient.Application.Products.Search
 {
@@ -10,7 +12,7 @@ namespace ConsoleClient.Application.Products.Search
     {
     }
 
-    [Path("products/search")]
+    [EndPoint("products/search")]
     public class SearchProducts : UseCase<SearchProductsCommand, string>
     {
         public override async Task<string> ExecuteAsync(SearchProductsCommand command)
