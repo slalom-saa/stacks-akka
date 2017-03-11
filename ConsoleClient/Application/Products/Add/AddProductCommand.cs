@@ -3,7 +3,7 @@ using Slalom.Stacks.Validation;
 
 namespace ConsoleClient.Application.Products.Add
 {
-    public class AddProductCommand
+    public class AddProductCommand : Command
     {
         [NotNull("no")]
         public string Name { get; }

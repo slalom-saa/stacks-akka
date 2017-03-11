@@ -36,18 +36,16 @@ namespace ConsoleClient
 
     //}
 
-    //[EndPoint("products")]
-    //public class AC : CommandCoordinator
-    //{
-    //    public AC(IComponentContext components) : base(components)
-    //    {
-    //    }
+    [EndPoint("products/add")]
+    public class AC : EndPointHost<AddProduct>
+    {
+        public AC(AddProduct service)
+            : base(service)
+        {
+        }
 
-    //    protected override bool Execute(ExecutionContext request)
-    //    {
-    //        return base.Execute(request);
-    //    }
-    //}
+        public override int Retries => 3;
+    }
 
     public class Program
     {
@@ -73,11 +71,14 @@ namespace ConsoleClient
 
                     stack.Send(new AddProductCommand("afd", 14)).Wait();
                     stack.Send(new AddProductCommand("afd", 14)).Wait();
-                    stack.Send(new AddProductCommand("afd", 14)).Wait();
+
+                    var x = stack.Send(new AddProductCommand("afd", 14)).Result;
+
+                    Console.WriteLine(x.ToJson());
                     Console.WriteLine("exit");
 
 
-                    stack.GetExit().Wait();
+                    Console.ReadKey();
                 }
             }
             catch (Exception exception)

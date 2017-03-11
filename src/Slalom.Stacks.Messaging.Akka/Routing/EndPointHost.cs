@@ -13,17 +13,17 @@ namespace Slalom.Stacks.Messaging.Routing
     /// </summary>
     /// <typeparam name="TService">The type of the service.</typeparam>
     /// <seealso cref="Akka.Actor.ReceiveActor" />
-    public class EndPointActor<TService> : ReceiveActor where TService : Service
+    public class EndPointHost<TService> : ReceiveActor where TService : Service
     {
         private readonly TService _service;
 
         private int _currentRetries;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EndPointActor{TService}"/> class.
+        /// Initializes a new instance of the <see cref="EndPointHost{TService}"/> class.
         /// </summary>
         /// <param name="service">The service.</param>
-        public EndPointActor(TService service)
+        public EndPointHost(TService service)
         {
             Argument.NotNull(service, nameof(service));
 
@@ -75,7 +75,9 @@ namespace Slalom.Stacks.Messaging.Routing
             else
             {
                 var item = (ExecutionContext)message;
-                this.Self.Forward(item);
+                var context = new ExecutionContext(item.Request, item.EndPoint, item.CancellationToken);
+                //Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromSeconds(.5), this.Self, context, this.Sender);
+                this.Self.Forward(context);
             }
         }
     }

@@ -5,7 +5,7 @@
 
 param (
     $Configuration = "DEBUG",
-    $IncrementVersion = $false
+    $IncrementVersion = $true
 )
 
 function Increment-Version() {
@@ -46,6 +46,7 @@ function Go ($Path) {
     Push-Location $Path
 
     Remove-Item .\Bin -Force -Recurse
+
     if ($IncrementVersion) {
         Increment-Version
     }
