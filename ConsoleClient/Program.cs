@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Akka.Actor;
 using Akka.Configuration;
+using Akka.Util;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
 using ConsoleClient.Domain.Products;
@@ -44,7 +45,7 @@ namespace ConsoleClient
         {
         }
 
-        public override int Retries => 3;
+        public override int Retries => 5;
     }
 
     public class Program
@@ -63,21 +64,19 @@ namespace ConsoleClient
                         //e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
 
+                    for (int i = 0; i < 100; i++)
+                    {
+                        StandardOutWriter.WriteLine(i.ToString());
 
-                    //var result = stack.Send("remote").Result;
+                        var result = stack.Send(new AddProductCommand("name", 15)).Result;
+                        if (!result.IsSuccessful)
+                        {
+                            StandardOutWriter.WriteLine(i.ToString(), ConsoleColor.DarkBlue);
+                            Console.ReadKey();
+                        }
+                    }
 
-
-                    //Console.WriteLine(result.ToJson());
-
-                    stack.Send(new AddProductCommand("afd", 14)).Wait();
-                    stack.Send(new AddProductCommand("afd", 14)).Wait();
-
-                    var x = stack.Send(new AddProductCommand("afd", 14)).Result;
-
-                    Console.WriteLine(x.ToJson());
                     Console.WriteLine("exit");
-
-
                     Console.ReadKey();
                 }
             }

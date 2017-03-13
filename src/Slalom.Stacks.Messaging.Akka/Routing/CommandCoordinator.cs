@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Akka.Actor;
 using Akka.DI.Core;
-using Autofac;
-using System.Linq;
 using Akka.Routing;
+using Autofac;
 using Slalom.Stacks.Reflection;
-using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Registry;
 using Slalom.Stacks.Validation;
 
@@ -20,9 +19,9 @@ namespace Slalom.Stacks.Messaging.Routing
         private readonly IComponentContext _components;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandCoordinator"/> class.
+        /// Initializes a new instance of the <see cref="CommandCoordinator" /> class.
         /// </summary>
-        /// <param name="components">The configured <see cref="IComponentContext"/>.</param>
+        /// <param name="components">The configured <see cref="IComponentContext" />.</param>
         public CommandCoordinator(IComponentContext components)
         {
             Argument.NotNull(components, nameof(components));
@@ -51,7 +50,7 @@ namespace Slalom.Stacks.Messaging.Routing
             //foreach (var endPoint in endPoints)
             {
                 var name = endPoint.Path?.Substring(this.Path.Length).Trim('/') ?? "";
-                if (String.IsNullOrWhiteSpace(name))
+                if (string.IsNullOrWhiteSpace(name))
                 {
                     name = endPoint.ServiceType.Split(' ')[0].Replace(".", "_");
                 }
@@ -95,17 +94,11 @@ namespace Slalom.Stacks.Messaging.Routing
         /// <inheritdoc />
         protected override SupervisorStrategy SupervisorStrategy()
         {
-            return new OneForOneStrategy( //or AllForOneStrategy
-                10,
-                TimeSpan.FromSeconds(30),
-                decider: Decider.From(x =>
+            return new OneForOneStrategy(10, TimeSpan.FromSeconds(10),
+                Decider.From(x =>
                 {
-                    //Maybe we consider ArithmeticException to not be application critical
-                    //so we just ignore the error and keep going.
-                    if (x is ArithmeticException) return Directive.Resume;
-
-                    //In all other cases, just restart the failing actor
-                    return Directive.Restart;
+                    var result = Directive.Restart;
+                    return result;
                 }));
         }
     }
