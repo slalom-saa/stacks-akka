@@ -1,25 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Akka.Actor;
-using Akka.Configuration;
 using Akka.Util;
-using Autofac;
 using ConsoleClient.Application.Products.Add;
-using ConsoleClient.Domain.Products;
-using Newtonsoft.Json;
 using Slalom.Stacks;
-using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Messaging.Application;
-using Slalom.Stacks.Messaging.Logging;
 using Slalom.Stacks.Messaging.Routing;
-using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Registry;
-using Slalom.Stacks.Text;
 
 #pragma warning disable 4014
 
@@ -64,7 +50,7 @@ namespace ConsoleClient
                         //e.WithRemotes("akka.tcp://local@localhost:8081");
                     });
 
-                    for (int i = 0; i < 100; i++)
+                    for (var i = 0; i < 100; i++)
                     {
                         StandardOutWriter.WriteLine(i.ToString());
 
