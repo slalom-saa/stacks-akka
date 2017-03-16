@@ -8,12 +8,8 @@ using Slalom.Stacks.Services.Registry;
 
 namespace Slalom.Stacks.Messaging.Application
 {
-    public class GetAkkaStatusCommand
-    {
-    }
-
     [EndPoint("_systems/akka")]
-    public class GetAkkaStatus : SystemEndPoint<GetAkkaStatusCommand, object>
+    public class GetAkkaStatus : ServiceEndPoint
     {
         private IComponentContext _components;
 
@@ -22,9 +18,9 @@ namespace Slalom.Stacks.Messaging.Application
             _components = components;
         }
 
-        public override Task<object> Execute(GetAkkaStatusCommand command)
+        public override void Execute()
         {
-            return Task.FromResult((object)_components.ResolveAll<ActorSystem>()
+            this.Respond(_components.ResolveAll<ActorSystem>()
                        .Select(e => new
                        {
                            e.Name,
