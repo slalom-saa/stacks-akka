@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-    Packages the Akka.NET Messaging packages.
+    Packages the Akka.NET Messaging NuGet packages.
 #>
 
 param (
@@ -59,7 +59,7 @@ function Go ($Path) {
 
 Push-Location $PSScriptRoot
 
-Go ..\src\Slalom.Stacks.Messaging.Akka
+Go ..\src\Slalom.Stacks.Akka
 
 Pop-Location
 
