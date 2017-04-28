@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
 using Akka.Routing;
+using Slalom.Stacks.Messaging.EndPoints;
 using Slalom.Stacks.Services.Messaging;
 
-namespace Slalom.Stacks.Messaging.Services
+namespace Slalom.Stacks.Messaging.Messaging
 {
     public class ScheduleRunner : UntypedActor
     {
@@ -31,7 +30,6 @@ namespace Slalom.Stacks.Messaging.Services
 
             Context.ActorOf(Context.DI().Props<GetInventoryActor>(), "registry");
             Context.ActorOf(Context.DI().Props<RemoteCallActor>().WithRouter(new RoundRobinPool(15)), "remote");
-            Context.ActorOf(Context.DI().Props<LogService>().WithRouter(new RoundRobinPool(15)), "logs");
             Context.ActorOf(Context.DI().Props<ScheduleRunner>().WithRouter(new RoundRobinPool(15)), "schedule");
         }   
     }

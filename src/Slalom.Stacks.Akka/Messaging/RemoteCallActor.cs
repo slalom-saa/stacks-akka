@@ -4,7 +4,7 @@ using Akka.Actor;
 using Newtonsoft.Json;
 using Slalom.Stacks.Services.Messaging;
 
-namespace Slalom.Stacks.Messaging.Services
+namespace Slalom.Stacks.Messaging.Messaging
 {
     public class RemoteCallActor : ReceiveActor
     {

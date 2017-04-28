@@ -2,11 +2,10 @@ using System;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Autofac;
-using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Messaging;
 using Slalom.Stacks.Validation;
 
-namespace Slalom.Stacks.Messaging.Routing
+namespace Slalom.Stacks.Messaging.Messaging
 {
     /// <summary>
     /// Executes use cases by listening to the Akka.NET event stream.

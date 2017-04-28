@@ -3,8 +3,7 @@ using Akka.Util;
 using ConsoleClient.Application.Products.Add;
 using Slalom.Stacks;
 using Slalom.Stacks.Messaging;
-using Slalom.Stacks.Messaging.Application;
-using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Messaging.EndPoints;
 using Slalom.Stacks.Services;
 
 #pragma warning disable 4014
@@ -23,16 +22,11 @@ namespace ConsoleClient
 
     //}
 
-    //[EndPointHost("products/add")]
-    //public class AC : EndPointHost<AddProduct>
-    //{
-    //    public AC(AddProduct service)
-    //        : base(service)
-    //    {
-    //    }
-
-    //    public override int Retries => 5;
-    //}
+    [EndPointHost("products/add")]
+    public class AC : EndPointHost
+    {
+        public override int Retries => 5;
+    }
 
     public class Program
     {
@@ -46,7 +40,9 @@ namespace ConsoleClient
                 using (var stack = new Stack(typeof(AddProduct), typeof(GetAkkaStatus)))
                 {
                     stack.UseAkka();
-    
+
+                    stack.Send(new AddProductCommand("here", 15)).Wait();
+
                     stack.Schedule(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1), new AddProductCommand("name", 10));
 
                     Console.WriteLine("exit");

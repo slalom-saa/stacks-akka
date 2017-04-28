@@ -1,43 +1,40 @@
 using System;
-using Akka.Actor;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Akka.Actor;
+using Autofac;
 using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Messaging;
 using Slalom.Stacks.Validation;
 
-namespace Slalom.Stacks.Messaging.Routing
+namespace Slalom.Stacks.Messaging
 {
     /// <summary>
     /// An Akka.NET actor that executes an endpoint.
     /// </summary>
-    /// <typeparam name="TService">The type of the service.</typeparam>
     /// <seealso cref="Akka.Actor.ReceiveActor" />
-    public class EndPointHost<TService> : ReceiveActor
+    public class EndPointHost : ReceiveActor
     {
-        private readonly TService _service;
-
         private int _currentRetries;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EndPointHost{TService}"/> class.
+        /// Initializes a new instance of the <see cref="EndPointHost"/> class.
         /// </summary>
-        /// <param name="service">The service.</param>
-        public EndPointHost(TService service)
+        public EndPointHost()
         {
-            Argument.NotNull(service, nameof(service));
-
-            _service = service;
-
             this.ReceiveAsync<ExecutionContext>(this.Execute);
         }
+
+        public IComponentContext Components { get; set; }
 
         /// <summary>
         /// Gets the number of retries.
         /// </summary>
         /// <value>The number of retries.</value>
         public virtual int Retries { get; } = 0;
+
+        private Dictionary<Type, Object> _services = new Dictionary<Type, object>();
 
         /// <summary>
         /// Executes the the use case given the request.
@@ -48,15 +45,24 @@ namespace Slalom.Stacks.Messaging.Routing
         {
             Argument.NotNull(request, nameof(request));
 
-            var service = _service as IEndPoint;
+            var endPoint = request.EndPoint;
+            object handler = null;
+            if (_services.ContainsKey(endPoint.ServiceType))
+            {
+                handler = _services[endPoint.ServiceType];
+            }
+            else
+            {
+                handler = this.Components.Resolve(endPoint.ServiceType);
+                _services.Add(endPoint.ServiceType, handler);
+            }
+            var service = handler as IEndPoint;
             if (service != null)
             {
                 service.Context = request;
             }
 
-            var endPoint = request.EndPoint;
-
-            await (Task)endPoint.Method.Invoke(_service, new object[] { request.Request.Message.Body });
+            await (Task)endPoint.Method.Invoke(service, new object[] { request.Request.Message.Body });
 
             if (request.Exception != null)
             {

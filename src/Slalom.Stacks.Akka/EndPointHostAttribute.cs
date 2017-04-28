@@ -8,11 +8,11 @@ namespace Slalom.Stacks.Messaging
     [AttributeUsage(AttributeTargets.Class)]
     public class EndPointHostAttribute : Attribute
     {
-        public string Path { get; }
+        public string[] Paths { get; }
 
-        public EndPointHostAttribute(string path)
+        public EndPointHostAttribute(params string[] paths)
         {
-            this.Path = path;
+            this.Paths = paths;
         }
     }
 }

@@ -5,11 +5,10 @@ using Akka.DI.Core;
 using Akka.Routing;
 using Autofac;
 using Slalom.Stacks.Reflection;
-using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Messaging;
 using Slalom.Stacks.Validation;
 
-namespace Slalom.Stacks.Messaging.Routing
+namespace Slalom.Stacks.Messaging.Messaging
 {
     /// <summary>
     /// A default Akka.NET supervisor.
@@ -62,7 +61,7 @@ namespace Slalom.Stacks.Messaging.Routing
                     {
                         var full = (this.Path + "/" + parent.Split('/').Last()).Trim('/');
 
-                        var firstOrDefault = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<EndPointHostAttribute>().Any(x => x.Path == full));
+                        var firstOrDefault = types.Find<CommandCoordinator>().FirstOrDefault(e => e.GetAllAttributes<EndPointHostAttribute>().Any(x => x.Paths.Contains(full)));
                         var target = firstOrDefault
                                      ?? typeof(CommandCoordinator);
 
@@ -74,8 +73,8 @@ namespace Slalom.Stacks.Messaging.Routing
                 {
                     if (Context.Child(name).Equals(ActorRefs.Nobody))
                     {
-                        var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<EndPointHostAttribute>().Any(x => x.Path == this.Path + "/" + name))
-                                   ?? typeof(EndPointHost<>).MakeGenericType(endPoint.ServiceType);
+                        var type = types.Find<ActorBase>().FirstOrDefault(e => e.GetAllAttributes<EndPointHostAttribute>().Any(x => x.Paths.Contains(this.Path + "/" + name)))
+                                   ?? typeof(EndPointHost);
                         try
                         {
                             Context.ActorOf(Context.DI().Props(type).WithRouter(FromConfig.Instance), name);

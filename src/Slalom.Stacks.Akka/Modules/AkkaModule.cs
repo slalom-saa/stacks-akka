@@ -1,17 +1,14 @@
 using System;
-using System.Collections.Generic;
-using Autofac;
 using System.Linq;
 using System.Reflection;
 using Akka.Actor;
-using Slalom.Stacks.Messaging.Application;
-using Slalom.Stacks.Messaging.Routing;
-using Slalom.Stacks.Messaging.Services;
+using Autofac;
+using Slalom.Stacks.Messaging.EndPoints;
+using Slalom.Stacks.Messaging.Messaging;
 using Slalom.Stacks.Reflection;
-using Slalom.Stacks.Services.Messaging;
 using Module = Autofac.Module;
 
-namespace Slalom.Stacks.Messaging
+namespace Slalom.Stacks.Messaging.Modules
 {
     /// <summary>
     /// Autofac module that configures the Akka.NET messaging block.
@@ -40,7 +37,6 @@ namespace Slalom.Stacks.Messaging
             builder.RegisterType<ServicesCoordinator>().AsSelf();
             builder.RegisterType<GetInventoryActor>().AsSelf();
             builder.RegisterType<RemoteCallActor>().AsSelf();
-            builder.RegisterType<LogService>().AsSelf();
 
             builder.Register(c => new AkkaMessageDispatcher(c.Resolve<ActorSystem>(), c.Resolve<IComponentContext>()))
                 .AsSelf()
@@ -51,8 +47,6 @@ namespace Slalom.Stacks.Messaging
                    .AsSelf()
                    .InstancePerDependency()
                    .PropertiesAutowired();
-
-            builder.RegisterGeneric(typeof(EndPointHost<>));
 
             _stack.Assemblies.CollectionChanged += (sender, args) =>
             {

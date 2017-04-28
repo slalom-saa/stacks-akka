@@ -1,4 +1,4 @@
-namespace Slalom.Stacks.Messaging.Services
+namespace Slalom.Stacks.Messaging.Messaging
 {
     public class RemoteCall
     {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Autofac;
 using Slalom.Stacks.Services;
 
-namespace Slalom.Stacks.Messaging.Application
+namespace Slalom.Stacks.Messaging.EndPoints
 {
     [EndPoint("_system/akka")]
     public class GetAkkaStatus : EndPoint

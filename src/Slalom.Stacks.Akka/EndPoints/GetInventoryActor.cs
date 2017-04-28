@@ -1,10 +1,9 @@
 using System;
 using System.Linq;
 using Akka.Actor;
-using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Inventory;
 
-namespace Slalom.Stacks.Messaging.Services
+namespace Slalom.Stacks.Messaging.EndPoints
 {
     public class GetInventoryActor : ReceiveActor
     {

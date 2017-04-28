@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
 using Autofac;
 using Newtonsoft.Json;
-using Slalom.Stacks.Messaging.Routing;
-using Slalom.Stacks.Messaging.Services;
-using Slalom.Stacks.Runtime;
-using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Inventory;
 using Slalom.Stacks.Services.Messaging;
 using ExecutionContext = Slalom.Stacks.Services.Messaging.ExecutionContext;
 
-namespace Slalom.Stacks.Messaging
+namespace Slalom.Stacks.Messaging.Messaging
 {
     public class AkkaMessageDispatcher : ILocalMessageDispatcher
     {
