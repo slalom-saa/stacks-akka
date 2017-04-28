@@ -46,18 +46,8 @@ namespace ConsoleClient
                 using (var stack = new Stack(typeof(AddProduct), typeof(GetAkkaStatus)))
                 {
                     stack.UseAkka();
-
-                    for (var i = 0; i < 100; i++)
-                    {
-                        StandardOutWriter.WriteLine(i.ToString());
-
-                        var result = stack.Send(new AddProductCommand("name", 15)).Result;
-                        if (!result.IsSuccessful)
-                        {
-                            Console.WriteLine("...");
-                            Console.ReadKey();
-                        }
-                    }
+    
+                    stack.Schedule(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1), new AddProductCommand("name", 10));
 
                     Console.WriteLine("exit");
                     Console.ReadKey();

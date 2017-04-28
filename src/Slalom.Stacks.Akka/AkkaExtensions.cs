@@ -113,5 +113,21 @@ namespace Slalom.Stacks.Messaging
 
             return instance;
         }
+
+        public static Stack Schedule(this Stack instance, TimeSpan delay, object message)
+        {
+            var system = instance.Container.Resolve<ActorSystem>();
+            var actorSelection = system.ActorSelection("user/_services/schedule");
+            system.Scheduler.ScheduleTellOnce(delay, actorSelection, message, ActorRefs.NoSender);
+            return instance;
+        }
+
+        public static Stack Schedule(this Stack instance, TimeSpan delay, TimeSpan interval, object message)
+        {
+            var system = instance.Container.Resolve<ActorSystem>();
+            var actorSelection = system.ActorSelection("user/_services/schedule");
+            system.Scheduler.ScheduleTellRepeatedly(delay, interval, actorSelection, message, ActorRefs.NoSender);
+            return instance;
+        }
     }
 }
