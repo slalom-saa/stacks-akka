@@ -93,7 +93,17 @@ namespace Slalom.Stacks.Messaging
             var options = new MessagingOptions();
             configuration?.Invoke(options);
 
-            var system = ActorSystem.Create(options.SystemName);
+            var system = ActorSystem.Create(options.SystemName, @"akka {  
+            actor {              
+              serializers {
+                wire = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+              }
+              serialization-bindings {
+                ""System.Object"" = wire
+              }
+            }
+          }");
+
             new AutoFacDependencyResolver(instance.Container, system);
 
             instance.Use(builder =>

@@ -6,6 +6,7 @@ using Slalom.Stacks;
 using Slalom.Stacks.Logging;
 using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Services;
+using Slalom.Stacks.Services.Logging;
 
 namespace RemoteClient
 {
