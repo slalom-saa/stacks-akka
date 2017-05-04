@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
-using Akka.Configuration;
 using Akka.DI.AutoFac;
 using Akka.DI.Core;
 using Autofac;
 using Slalom.Stacks.Logging;
-using Slalom.Stacks.Messaging.Messaging;
-using Slalom.Stacks.Messaging.Modules;
+using Slalom.Stacks.Messaging.Logging;
+using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Messaging.Services;
 using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Logging;
 
@@ -93,16 +93,17 @@ namespace Slalom.Stacks.Messaging
             var options = new MessagingOptions();
             configuration?.Invoke(options);
 
-            var system = ActorSystem.Create(options.SystemName, @"akka {
-  actor {
-    serializers {
-      hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
-        }
-        serialization-bindings {
-            ""System.Object"" = hyperion
-        }
-    }
-}");
+            var system = ActorSystem.Create(options.SystemName, @"akka {  
+            actor {              
+              serializers {
+                wire = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+              }
+              serialization-bindings {
+                ""System.Object"" = wire
+              }
+            }
+          }");
+
             new AutoFacDependencyResolver(instance.Container, system);
 
             instance.Use(builder =>
@@ -113,6 +114,12 @@ namespace Slalom.Stacks.Messaging
             });
 
             system.ActorOf(system.DI().Props<ServicesCoordinator>(), "_services");
+
+            var registry = instance.GetServices();
+            foreach (var remote in options.Remotes)
+            {
+                //registry.Include(instance.GetRegistry(remote));
+            }
 
             return instance;
         }
