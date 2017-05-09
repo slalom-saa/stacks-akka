@@ -60,8 +60,6 @@ namespace RemoteClient
 
             using (var stack = new Stack())
             {
-                stack.UseSimpleConsoleLogging();
-
                 stack.RunAkkaHost();
             }
         }

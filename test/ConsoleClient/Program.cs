@@ -10,22 +10,33 @@ using Slalom.Stacks.Services;
 
 namespace ConsoleClient
 {
-    //[EndPoint("products/add")]
-    //public class B : ServiceActor<AddProduct, AddProductCommand>
-    //{
-    //    public B(AddProduct handler)
-    //        : base(handler)
-    //    {
-    //    }
-
-    //    public override int Retries => 3;
-
-    //}
-
-    [EndPointHost("products/add")]
+    [EndPointHost("home/parent")]
     public class AC : EndPointHost
     {
-        public override int Retries => 5;
+        public override int Retries => 2;
+    }
+
+
+    [EndPoint("home/parent")]
+    public class Parent : EndPoint
+    {
+
+
+        private int i = 0;
+        public override void Receive()
+        {
+            if (i++ > 5)
+            {
+                throw new Exception();
+            }
+
+            this.Respond("adf");
+        }
+
+        public override void OnStart()
+        {
+            Console.WriteLine("Starting...");
+        }
     }
 
     public class Program
@@ -41,9 +52,12 @@ namespace ConsoleClient
                 {
                     stack.UseAkka();
 
-                    stack.Send(new AddProductCommand("here", 15)).Wait();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var result = stack.Send("home/parent").Result;
 
-                    stack.Schedule(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1), new AddProductCommand("name", 10));
+                        Console.WriteLine(result.IsSuccessful);
+                    }
 
                     Console.WriteLine("exit");
                     Console.ReadKey();

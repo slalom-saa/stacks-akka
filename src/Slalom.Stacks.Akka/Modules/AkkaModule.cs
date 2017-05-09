@@ -36,7 +36,6 @@ namespace Slalom.Stacks.Messaging.Modules
 
             builder.RegisterType<ServicesCoordinator>().AsSelf();
             builder.RegisterType<GetInventoryActor>().AsSelf();
-            builder.RegisterType<RemoteCallActor>().AsSelf();
 
             builder.Register(c => new AkkaMessageDispatcher(c.Resolve<ActorSystem>(), c.Resolve<IComponentContext>()))
                 .AsSelf()

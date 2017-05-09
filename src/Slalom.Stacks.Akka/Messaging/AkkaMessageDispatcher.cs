@@ -22,7 +22,6 @@ namespace Slalom.Stacks.Messaging.Messaging
         {
             _system = system;
             _commands = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
-            _events = system.ActorOf(system.DI().Props<EventStreamListener>(), "events");
         }
 
         public async Task<MessageResult> Dispatch(Request request, EndPointMetaData endPoint, ExecutionContext parentContext, TimeSpan? timeout = null)
@@ -41,22 +40,8 @@ namespace Slalom.Stacks.Messaging.Messaging
 
             try
             {
-                if (endPoint.RootPath.StartsWith("akka.tcp"))
-                {
-                    var content = request.Message.Body;
-                    if (!(content is String))
-                    {
-                        content = JsonConvert.SerializeObject(content);
-                    }
-
-                    var result = await _system.ActorSelection(endPoint.RootPath + "/user/_services/remote").Ask(new RemoteCall(endPoint.Path, (string)content), source.Token);
-                    return result as MessageResult;
-                }
-                else
-                {
-                    var result = await _commands.Ask(context, source.Token);
-                    return result as MessageResult;
-                }
+                var result = await _commands.Ask(context, source.Token);
+                return result as MessageResult;
             }
             catch (Exception exception)
             {

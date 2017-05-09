@@ -85,7 +85,6 @@ namespace Slalom.Stacks.Messaging
             {
                 var item = (ExecutionContext)message;
                 var context = new ExecutionContext(item.Request, item.EndPoint, item.CancellationToken);
-                //Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromSeconds(.5), this.Self, context, this.Sender);
                 this.Self.Forward(context);
             }
         }

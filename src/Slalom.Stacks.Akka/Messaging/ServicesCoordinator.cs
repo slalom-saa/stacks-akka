@@ -29,7 +29,6 @@ namespace Slalom.Stacks.Messaging.Messaging
             base.PreStart();
 
             Context.ActorOf(Context.DI().Props<GetInventoryActor>(), "registry");
-            Context.ActorOf(Context.DI().Props<RemoteCallActor>().WithRouter(new RoundRobinPool(15)), "remote");
             Context.ActorOf(Context.DI().Props<ScheduleRunner>().WithRouter(new RoundRobinPool(15)), "schedule");
         }   
     }
