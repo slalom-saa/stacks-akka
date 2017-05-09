@@ -3,36 +3,41 @@ using Akka.Util;
 using ConsoleClient.Application.Products.Add;
 using Slalom.Stacks;
 using Slalom.Stacks.Messaging;
-using Slalom.Stacks.Messaging.Application;
-using Slalom.Stacks.Messaging.Routing;
+using Slalom.Stacks.Messaging.EndPoints;
 using Slalom.Stacks.Services;
 
 #pragma warning disable 4014
 
 namespace ConsoleClient
 {
-    //[EndPoint("products/add")]
-    //public class B : ServiceActor<AddProduct, AddProductCommand>
-    //{
-    //    public B(AddProduct handler)
-    //        : base(handler)
-    //    {
-    //    }
+    [EndPointHost("home/parent")]
+    public class AC : EndPointHost
+    {
+        public override int Retries => 2;
+    }
 
-    //    public override int Retries => 3;
 
-    //}
+    [EndPoint("home/parent")]
+    public class Parent : EndPoint
+    {
 
-    //[EndPointHost("products/add")]
-    //public class AC : EndPointHost<AddProduct>
-    //{
-    //    public AC(AddProduct service)
-    //        : base(service)
-    //    {
-    //    }
 
-    //    public override int Retries => 5;
-    //}
+        private int i = 0;
+        public override void Receive()
+        {
+            if (i++ > 5)
+            {
+                throw new Exception();
+            }
+
+            this.Respond("adf");
+        }
+
+        public override void OnStart()
+        {
+            Console.WriteLine("Starting...");
+        }
+    }
 
     public class Program
     {
@@ -47,16 +52,11 @@ namespace ConsoleClient
                 {
                     stack.UseAkka();
 
-                    for (var i = 0; i < 100; i++)
+                    for (int i = 0; i < 10; i++)
                     {
-                        StandardOutWriter.WriteLine(i.ToString());
+                        var result = stack.Send("home/parent").Result;
 
-                        var result = stack.Send(new AddProductCommand("name", 15)).Result;
-                        if (!result.IsSuccessful)
-                        {
-                            Console.WriteLine("...");
-                            Console.ReadKey();
-                        }
+                        Console.WriteLine(result.IsSuccessful);
                     }
 
                     Console.WriteLine("exit");

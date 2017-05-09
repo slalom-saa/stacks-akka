@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Slalom.Stacks.Messaging.Services
+namespace Slalom.Stacks.Messaging.EndPoints
 {
     public class GetInventoryCommand
     {

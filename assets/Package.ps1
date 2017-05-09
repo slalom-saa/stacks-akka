@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-    Packages the Akka.NET Messaging NuGet packages.
+    Packages the Akka.NET NuGet packages.
 #>
 
 param (

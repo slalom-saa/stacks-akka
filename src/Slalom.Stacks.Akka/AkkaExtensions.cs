@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using Akka.DI.Core;
+using Autofac;
 using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.AutoFac;
-using Akka.DI.Core;
-using Autofac;
-using Slalom.Stacks.Logging;
-using Slalom.Stacks.Messaging.Logging;
-using Slalom.Stacks.Messaging.Routing;
-using Slalom.Stacks.Messaging.Services;
+using Slalom.Stacks.Messaging.Messaging;
+using Slalom.Stacks.Messaging.Modules;
 using Slalom.Stacks.Services;
-using Slalom.Stacks.Services.Logging;
 
 // ReSharper disable ObjectCreationAsStatement
 
@@ -32,15 +28,6 @@ namespace Slalom.Stacks.Messaging
             return instance.Container.Resolve<ActorSystem>().WhenTerminated;
         }
 
-        //public static ServiceRegistry GetRegistry(this Stack instance, string path = "akka://local")
-        //{
-        //    if (!path.EndsWith("/"))
-        //    {
-        //        path += "/";
-        //    }
-        //    return (ServiceRegistry)instance.Container.Resolve<ActorSystem>().ActorSelection(path + "/user/_services/registry").Ask(new GetInventoryCommand(path)).Result;
-        //}
-
         /// <summary>
         /// Configures the stack to use Akka.NET Messaging and runs the Akka host.
         /// </summary>
@@ -53,34 +40,37 @@ namespace Slalom.Stacks.Messaging
 
             instance.GetExit().Wait();
         }
-      
-        ///// <summary>
-        ///// Configures the stack to use Akka.NET Messaging.
-        ///// </summary>
-        ///// <param name="instance">The this instance.</param>
-        ///// <param name="configuration">The configuration routine.</param>
-        ///// <returns>Stack.</returns>
-        //public static Stack UseAkkaLogging(this Stack instance, Action<LoggingOptions> configuration = null)
-        //{
-        //    var options = new LoggingOptions();
-        //    configuration?.Invoke(options);
 
-        //    var system = ActorSystem.Create(options.SystemName);
-        //    new AutoFacDependencyResolver(instance.Container, system);
+        /// <summary>
+        /// Schedules the specified message using the specified delay.
+        /// </summary>
+        /// <param name="instance">The instance.</param>
+        /// <param name="delay">The time to delay.</param>
+        /// <param name="message">The message to send.</param>
+        /// <returns>Stack.</returns>
+        public static Stack Schedule(this Stack instance, TimeSpan delay, object message)
+        {
+            var system = instance.Container.Resolve<ActorSystem>();
+            var actorSelection = system.ActorSelection("user/_services/schedule");
+            system.Scheduler.ScheduleTellOnce(delay, actorSelection, message, ActorRefs.NoSender);
+            return instance;
+        }
 
-        //    instance.Use(builder =>
-        //    {
-        //        builder.Register(c => new LogClient(system, options))
-        //               .PreserveExistingDefaults()
-        //               .SingleInstance()
-        //               .As<ILogger>()
-        //               .As<IRequestLog>()
-        //               .As<IRequestLog>()
-        //               .PreserveExistingDefaults();
-        //    });
-
-        //    return instance;
-        //}
+        /// <summary>
+        /// Schedules the request to run repeatedly using the specified delay and interval.
+        /// </summary>
+        /// <param name="instance">The instance.</param>
+        /// <param name="delay">The time to delay delay.</param>
+        /// <param name="interval">The time between sends.</param>
+        /// <param name="message">The message to send.</param>
+        /// <returns>Stack.</returns>
+        public static Stack Schedule(this Stack instance, TimeSpan delay, TimeSpan interval, object message)
+        {
+            var system = instance.Container.Resolve<ActorSystem>();
+            var actorSelection = system.ActorSelection("user/_services/schedule");
+            system.Scheduler.ScheduleTellRepeatedly(delay, interval, actorSelection, message, ActorRefs.NoSender);
+            return instance;
+        }
 
         /// <summary>
         /// Configures the stack to use Akka.NET Messaging.
@@ -93,7 +83,17 @@ namespace Slalom.Stacks.Messaging
             var options = new MessagingOptions();
             configuration?.Invoke(options);
 
-            var system = ActorSystem.Create(options.SystemName);
+            var system = ActorSystem.Create(options.SystemName, @"akka {  
+            actor {              
+              serializers {
+                wire = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+              }
+              serialization-bindings {
+                ""System.Object"" = wire
+              }
+            }
+          }");
+
             new AutoFacDependencyResolver(instance.Container, system);
 
             instance.Use(builder =>
