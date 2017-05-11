@@ -1,17 +1,23 @@
-﻿using System;
-using Akka.DI.Core;
-using Autofac;
-using System.Linq;
+﻿/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
+using System;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.AutoFac;
-using Slalom.Stacks.Messaging.Messaging;
-using Slalom.Stacks.Messaging.Modules;
+using Akka.DI.Core;
+using Autofac;
+using Slalom.Stacks.Akka.Messaging;
+using Slalom.Stacks.Akka.Modules;
 using Slalom.Stacks.Services;
 
 // ReSharper disable ObjectCreationAsStatement
 
-namespace Slalom.Stacks.Messaging
+namespace Slalom.Stacks.Akka
 {
     /// <summary>
     /// Extension methods for configuring the Akka.NET messaging blocks.

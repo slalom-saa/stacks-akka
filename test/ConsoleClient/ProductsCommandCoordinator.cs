@@ -8,8 +8,7 @@ using Akka.Routing;
 using Autofac;
 using ConsoleClient.Application.Products.Add;
 using ConsoleClient.Application.Products.Stock;
-using Slalom.Stacks.Messaging;
-using Slalom.Stacks.Messaging.Messaging;
+using Slalom.Stacks.Akka.Messaging;
 using Slalom.Stacks.Text;
 using Slalom.Stacks.Reflection;
 

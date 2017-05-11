@@ -1,14 +1,20 @@
-using System;
+/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
 using System.Linq;
 using System.Reflection;
 using Akka.Actor;
 using Autofac;
-using Slalom.Stacks.Messaging.EndPoints;
-using Slalom.Stacks.Messaging.Messaging;
+using Slalom.Stacks.Akka.EndPoints;
+using Slalom.Stacks.Akka.Messaging;
 using Slalom.Stacks.Reflection;
 using Module = Autofac.Module;
 
-namespace Slalom.Stacks.Messaging.Modules
+namespace Slalom.Stacks.Akka.Modules
 {
     /// <summary>
     /// Autofac module that configures the Akka.NET messaging block.
@@ -42,20 +48,20 @@ namespace Slalom.Stacks.Messaging.Modules
                 .AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(_stack.Assemblies.ToArray())
-                   .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
-                   .AsSelf()
-                   .InstancePerDependency()
-                   .PropertiesAutowired();
+                .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
+                .AsSelf()
+                .InstancePerDependency()
+                .PropertiesAutowired();
 
             _stack.Assemblies.CollectionChanged += (sender, args) =>
             {
                 _stack.Use(b =>
                 {
                     b.RegisterAssemblyTypes(args.NewItems.OfType<Assembly>().ToArray())
-                     .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
-                     .AsSelf()
-                     .InstancePerDependency()
-                     .PropertiesAutowired();
+                        .Where(e => e.GetBaseAndContractTypes().Any(x => x == typeof(ActorBase)))
+                        .AsSelf()
+                        .InstancePerDependency()
+                        .PropertiesAutowired();
                 });
             };
         }

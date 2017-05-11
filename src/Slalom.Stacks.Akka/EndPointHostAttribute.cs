@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
 
-namespace Slalom.Stacks.Messaging
+using System;
+
+namespace Slalom.Stacks.Akka
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class EndPointHostAttribute : Attribute
     {
-        public string[] Paths { get; }
-
         public EndPointHostAttribute(params string[] paths)
         {
             this.Paths = paths;
         }
+
+        public string[] Paths { get; }
     }
 }

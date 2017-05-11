@@ -1,4 +1,11 @@
-﻿using System;
+﻿/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
+using System;
 using System.Linq;
 using Akka.Actor;
 using Akka.DI.Core;
@@ -8,12 +15,12 @@ using Slalom.Stacks.Reflection;
 using Slalom.Stacks.Services.Messaging;
 using Slalom.Stacks.Validation;
 
-namespace Slalom.Stacks.Messaging.Messaging
+namespace Slalom.Stacks.Akka.Messaging
 {
     /// <summary>
     /// A default Akka.NET supervisor.
     /// </summary>
-    /// <seealso cref="Akka.Actor.ReceiveActor" />
+    /// <seealso cref="ReceiveActor" />
     public class CommandCoordinator : ReceiveActor
     {
         private readonly IComponentContext _components;

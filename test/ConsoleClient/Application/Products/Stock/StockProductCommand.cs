@@ -1,5 +1,4 @@
-﻿using Slalom.Stacks.Messaging;
-
+﻿
 namespace ConsoleClient.Application.Products.Stock
 {
     public class StockProductCommand

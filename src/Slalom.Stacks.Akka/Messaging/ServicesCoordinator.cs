@@ -1,12 +1,17 @@
-﻿using System;
-using System.Linq;
+﻿/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
 using Akka.Actor;
 using Akka.DI.Core;
 using Akka.Routing;
-using Slalom.Stacks.Messaging.EndPoints;
+using Slalom.Stacks.Akka.EndPoints;
 using Slalom.Stacks.Services.Messaging;
 
-namespace Slalom.Stacks.Messaging.Messaging
+namespace Slalom.Stacks.Akka.Messaging
 {
     public class ScheduleRunner : UntypedActor
     {
@@ -16,6 +21,7 @@ namespace Slalom.Stacks.Messaging.Messaging
         {
             _messages = messages;
         }
+
         protected override void OnReceive(object message)
         {
             _messages.Send(message);
@@ -30,6 +36,6 @@ namespace Slalom.Stacks.Messaging.Messaging
 
             Context.ActorOf(Context.DI().Props<GetInventoryActor>(), "registry");
             Context.ActorOf(Context.DI().Props<ScheduleRunner>().WithRouter(new RoundRobinPool(15)), "schedule");
-        }   
+        }
     }
 }
