@@ -1,4 +1,3 @@
-using Slalom.Stacks.Messaging;
 using Slalom.Stacks.Validation;
 
 namespace ConsoleClient.Application.Products.Add

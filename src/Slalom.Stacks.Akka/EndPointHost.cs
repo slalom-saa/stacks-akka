@@ -1,6 +1,12 @@
+/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Autofac;
@@ -8,18 +14,20 @@ using Slalom.Stacks.Services;
 using Slalom.Stacks.Services.Messaging;
 using Slalom.Stacks.Validation;
 
-namespace Slalom.Stacks.Messaging
+namespace Slalom.Stacks.Akka
 {
     /// <summary>
     /// An Akka.NET actor that executes an endpoint.
     /// </summary>
-    /// <seealso cref="Akka.Actor.ReceiveActor" />
+    /// <seealso cref="ReceiveActor" />
     public class EndPointHost : ReceiveActor
     {
         private int _currentRetries;
 
+        private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="EndPointHost"/> class.
+        /// Initializes a new instance of the <see cref="EndPointHost" /> class.
         /// </summary>
         public EndPointHost()
         {
@@ -33,8 +41,6 @@ namespace Slalom.Stacks.Messaging
         /// </summary>
         /// <value>The number of retries.</value>
         public virtual int Retries { get; } = 0;
-
-        private Dictionary<Type, Object> _services = new Dictionary<Type, object>();
 
         /// <summary>
         /// Executes the the use case given the request.
@@ -62,7 +68,7 @@ namespace Slalom.Stacks.Messaging
                 service.Context = request;
             }
 
-            await (Task)endPoint.Method.Invoke(service, new object[] { request.Request.Message.Body });
+            await (Task) endPoint.Method.Invoke(service, new[] {request.Request.Message.Body});
 
             if (request.Exception != null)
             {
@@ -79,11 +85,11 @@ namespace Slalom.Stacks.Messaging
 
             if (_currentRetries >= this.Retries)
             {
-                this.Sender.Tell(new MessageResult((ExecutionContext)message));
+                this.Sender.Tell(new MessageResult((ExecutionContext) message));
             }
             else
             {
-                var item = (ExecutionContext)message;
+                var item = (ExecutionContext) message;
                 var context = new ExecutionContext(item.Request, item.EndPoint, item.CancellationToken);
                 this.Self.Forward(context);
             }

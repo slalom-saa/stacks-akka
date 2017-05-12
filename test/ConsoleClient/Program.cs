@@ -2,8 +2,8 @@
 using Akka.Util;
 using ConsoleClient.Application.Products.Add;
 using Slalom.Stacks;
-using Slalom.Stacks.Messaging;
-using Slalom.Stacks.Messaging.EndPoints;
+using Slalom.Stacks.Akka;
+using Slalom.Stacks.Akka.EndPoints;
 using Slalom.Stacks.Services;
 
 #pragma warning disable 4014

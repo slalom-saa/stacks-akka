@@ -1,21 +1,26 @@
-﻿using System;
-using System.Linq;
+﻿/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.DI.Core;
 using Autofac;
-using Newtonsoft.Json;
 using Slalom.Stacks.Services.Inventory;
 using Slalom.Stacks.Services.Messaging;
 using ExecutionContext = Slalom.Stacks.Services.Messaging.ExecutionContext;
 
-namespace Slalom.Stacks.Messaging.Messaging
+namespace Slalom.Stacks.Akka.Messaging
 {
     public class AkkaMessageDispatcher : ILocalMessageDispatcher
     {
         private readonly ActorSystem _system;
-        private IActorRef _commands;
+        private readonly IActorRef _commands;
         private IActorRef _events;
 
         public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)

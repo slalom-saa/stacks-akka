@@ -1,15 +1,21 @@
-﻿using System;
+﻿/* 
+ * Copyright (c) Stacks Contributors
+ * 
+ * This file is subject to the terms and conditions defined in
+ * the LICENSE file, which is part of this source code package.
+ */
+
 using System.Linq;
 using Akka.Actor;
 using Autofac;
 using Slalom.Stacks.Services;
 
-namespace Slalom.Stacks.Messaging.EndPoints
+namespace Slalom.Stacks.Akka.EndPoints
 {
     [EndPoint("_system/akka")]
     public class GetAkkaStatus : EndPoint
     {
-        private IComponentContext _components;
+        private readonly IComponentContext _components;
 
         public GetAkkaStatus(IComponentContext components)
         {
@@ -19,12 +25,12 @@ namespace Slalom.Stacks.Messaging.EndPoints
         public override void Receive()
         {
             this.Respond(_components.ResolveAll<ActorSystem>()
-                       .Select(e => new
-                       {
-                           e.Name,
-                           e.StartTime,
-                           e.Uptime
-                       }));
+                .Select(e => new
+                {
+                    e.Name,
+                    e.StartTime,
+                    e.Uptime
+                }));
         }
     }
 }
