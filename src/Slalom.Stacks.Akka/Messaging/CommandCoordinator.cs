@@ -59,7 +59,7 @@ namespace Slalom.Stacks.Akka.Messaging
                 var name = endPoint.Path?.Substring(this.Path.Length).Trim('/') ?? "";
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    name = endPoint.ServiceType.Name.Split(' ')[0].Replace(".", "_");
+                    name = endPoint.EndPointType.Name.Split(' ')[0].Replace(".", "_");
                 }
                 if (name.Split('/').Length > 1)
                 {

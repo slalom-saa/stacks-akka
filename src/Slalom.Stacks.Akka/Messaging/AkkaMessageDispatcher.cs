@@ -13,15 +13,13 @@ using Akka.DI.Core;
 using Autofac;
 using Slalom.Stacks.Services.Inventory;
 using Slalom.Stacks.Services.Messaging;
-using ExecutionContext = Slalom.Stacks.Services.Messaging.ExecutionContext;
 
 namespace Slalom.Stacks.Akka.Messaging
 {
-    public class AkkaMessageDispatcher : ILocalMessageDispatcher
+    public class AkkaMessageDispatcher : IRequestRouter
     {
         private readonly ActorSystem _system;
         private readonly IActorRef _commands;
-        private IActorRef _events;
 
         public AkkaMessageDispatcher(ActorSystem system, IComponentContext components)
         {
@@ -29,7 +27,7 @@ namespace Slalom.Stacks.Akka.Messaging
             _commands = system.ActorOf(system.DI().Props<CommandCoordinator>(), "commands");
         }
 
-        public async Task<MessageResult> Dispatch(Request request, EndPointMetaData endPoint, ExecutionContext parentContext, TimeSpan? timeout = null)
+        public async Task<MessageResult> Route(Request request, EndPointMetaData endPoint, Services.Messaging.ExecutionContext parentContext, TimeSpan? timeout = null)
         {
             CancellationTokenSource source;
             if (timeout.HasValue || endPoint.Timeout.HasValue)
@@ -41,7 +39,7 @@ namespace Slalom.Stacks.Akka.Messaging
                 source = new CancellationTokenSource();
             }
 
-            var context = new ExecutionContext(request, endPoint, source.Token, parentContext);
+            var context = new Services.Messaging.ExecutionContext(request, endPoint, source.Token, parentContext);
 
             try
             {
@@ -54,20 +52,6 @@ namespace Slalom.Stacks.Akka.Messaging
             }
 
             return new MessageResult(context);
-        }
-
-        public bool CanDispatch(EndPointMetaData endPoint)
-        {
-            return endPoint.RootPath.StartsWith("akka") || endPoint.RootPath == ServiceHost.LocalPath;
-        }
-
-        public async Task<MessageResult> Dispatch(Request request, ExecutionContext context)
-        {
-            context = new ExecutionContext(request, context);
-
-            var result = await _events.Ask(context);
-
-            return result as MessageResult;
         }
     }
 }

@@ -1,23 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C419ECC7-005A-4EEC-85A4-D327456F6DC9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{597124B3-9A03-49AC-AE9B-0C68601DCAFE}"
 	ProjectSection(SolutionItems) = preProject
 		assets\Package.ps1 = assets\Package.ps1
-		assets\Restore.ps1 = assets\Restore.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{04933F0A-35D2-4949-84F8-696B41B46D47}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Slalom.Stacks.Akka", "src\Slalom.Stacks.Akka\Slalom.Stacks.Akka.xproj", "{A60D63AD-FD7A-414A-80F7-89308D93F817}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slalom.Stacks.Akka", "src\Slalom.Stacks.Akka\Slalom.Stacks.Akka.csproj", "{A60D63AD-FD7A-414A-80F7-89308D93F817}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ConsoleClient", "test\ConsoleClient\ConsoleClient.xproj", "{1BA35C03-9833-4E24-BA34-84FCEE183D20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleClient", "test\ConsoleClient\ConsoleClient.csproj", "{1BA35C03-9833-4E24-BA34-84FCEE183D20}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "RemoteClient", "test\RemoteClient\RemoteClient.xproj", "{61B54A60-A263-44E0-A5E6-D5C9F924148C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteClient", "test\RemoteClient\RemoteClient.csproj", "{61B54A60-A263-44E0-A5E6-D5C9F924148C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
