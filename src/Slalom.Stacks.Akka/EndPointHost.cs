@@ -53,14 +53,14 @@ namespace Slalom.Stacks.Akka
 
             var endPoint = request.EndPoint;
             object handler = null;
-            if (_services.ContainsKey(endPoint.ServiceType))
+            if (_services.ContainsKey(endPoint.EndPointType))
             {
-                handler = _services[endPoint.ServiceType];
+                handler = _services[endPoint.EndPointType];
             }
             else
             {
-                handler = this.Components.Resolve(endPoint.ServiceType);
-                _services.Add(endPoint.ServiceType, handler);
+                handler = this.Components.Resolve(endPoint.EndPointType);
+                _services.Add(endPoint.EndPointType, handler);
             }
             var service = handler as IEndPoint;
             if (service != null)
@@ -68,7 +68,7 @@ namespace Slalom.Stacks.Akka
                 service.Context = request;
             }
 
-            await (Task) endPoint.Method.Invoke(service, new[] {request.Request.Message.Body});
+            await (Task) endPoint.InvokeMethod.Invoke(service, new[] {request.Request.Message.Body});
 
             if (request.Exception != null)
             {
